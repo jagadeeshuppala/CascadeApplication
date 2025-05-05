@@ -1,56 +1,52 @@
-package com.pharmacy.bridgwater.CascadeApp.service;
+package com.pharmacy.bridgwater.CascadeApp.Callable;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
-import com.pharmacy.bridgwater.CascadeApp.model.SigmaData;
+import com.pharmacy.bridgwater.CascadeApp.service.CascadeService;
 import io.github.bonigarcia.wdm.WebDriverManager;
-
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
-public class SigmaProcessService implements Callable<Map<String, Set<ActualSupplierData>>> {
-    Map<String,Set<ActualSupplierData>> cascadeDataForSigma;
-    public SigmaProcessService(Map<String,Set<ActualSupplierData>> cascadeDataForSigma){
-        this.cascadeDataForSigma = cascadeDataForSigma;
-    }
+public class SigmaProcessServiceWithoutCallable  {
 
-    public static void main(String args[]) throws InterruptedException, JsonProcessingException, JsonProcessingException {
+
+    public static void main(String args[]) throws InterruptedException,  JsonProcessingException {
         Long startTime = System.currentTimeMillis();
-        Map<String,Set<ActualSupplierData>> cascadeDataWithSigmaDataAdded = new LinkedHashMap<>();
+        Map<String,Set<String>> cascadeDataForSigma = new LinkedHashMap<>();
 
+        SigmaProcessServiceWithoutCallable process = new SigmaProcessServiceWithoutCallable();
         CascadeService cascade = new CascadeService();
         Map<String, Set<ActualSupplierData>> cascadeResultsMap = cascade.getCascadeResults();
-
-        SigmaProcessService process = new SigmaProcessService(cascadeResultsMap);
-        Map<String, Set<ActualSupplierData>> sigmaOnlyResults = process.call();
-
-        //Adding sigma results to the main list
         for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResultsMap.entrySet()) {
             String key = entry.getKey();
-            Set<ActualSupplierData> sigmaResults = sigmaOnlyResults.get(key);
-            Set<ActualSupplierData> value = entry.getValue();
-            //Adding sigma results
-            value.addAll(sigmaResults);
-            cascadeDataWithSigmaDataAdded.put(key, value);
-
-
+            Set<String> pipSet = entry.getValue().stream().filter(cs ->null!=cs.getCode())
+                    .map(cs -> cs.getCode())
+                    .collect(Collectors.toSet());
+            cascadeDataForSigma.put(key, pipSet);
         }
-        //System.out.println(cascadeDataWithSigmaDataAdded);
+
+        Map<String,Set<ActualSupplierData>> processedSigmaData = process.process(cascadeResultsMap);
+        System.out.println(processedSigmaData);
         Long endTime = System.currentTimeMillis();
         System.out.println("Total time taken for the whole process is "+ (endTime-startTime)/1000 +" seconds");
     }
 
 
-    @Override
-    public Map<String,Set<ActualSupplierData>> call() throws InterruptedException {
 
+    public Map<String,Set<ActualSupplierData>> process(Map<String,Set<ActualSupplierData>> cascadeDataForSigma) throws InterruptedException {
+
+        //Map<String,Set<ActualSupplierData>> sigmaProcessedData = new LinkedHashMap<>();
 
         WebDriverManager.chromedriver().setup();;
         WebDriver driver = new ChromeDriver();
@@ -62,27 +58,29 @@ public class SigmaProcessService implements Callable<Map<String, Set<ActualSuppl
                 .sendKeys(Keys.RETURN);
 
         Thread.sleep(1000);
-
-        int totalNoOfRecords = cascadeDataForSigma.size();
+        //driver.findElement(By.xpath("/html/body/form/div/div/center/div/label")).click();
+        //driver.findElement(By.xpath("/html[1]/body[1]/form[1]/div[1]/div[1]/center[1]/p[2]/button[1]")).click();
 
         for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeDataForSigma.entrySet()) {
-            System.out.println("!!!!!Sigma!!!!! still total no of records "+ totalNoOfRecords-- +":");
+            //Set<ActualSupplierData> sigmaData = new HashSet<>();
             Set<ActualSupplierData> existingData  = entry.getValue();
 
-            ActualSupplierData anyOfCascadeData = existingData.stream().findAny().orElse(null);
-
-            Set<String> pipCodes = existingData.stream().map(ActualSupplierData::getCode)
-                    .filter(code ->!StringUtils.isEmpty(code)).collect(Collectors.toSet());
+            Set<String> pipCodes = existingData.stream()
+                    .filter(v ->v.getCode()!=null)
+                    .map(ActualSupplierData::getCode).collect(Collectors.toSet());
 
             for(String pip : pipCodes){
                 Thread.sleep(1000);
-                System.out.println("!!!!!Sigma!!!!! Searching for pip code "+pip+":");
+
+
 
                 WebElement pipTextBox = driver.findElement(By.xpath("/html/body/article/div/div[1]/form/div[1]/div[2]/input"));
                 pipTextBox.clear();
                 pipTextBox.sendKeys(pip);
                 pipTextBox.sendKeys("\n\n");
-                Thread.sleep(5000);
+                Thread.sleep(3000);
+
+
                 try{
                     String stockClass = driver.findElement(By.xpath("/html/body/article/div/div[3]/div/dl/div/dt")).getAttribute("class");
                     if(!stockClass.equalsIgnoreCase("ng-binding special")){
@@ -90,21 +88,17 @@ public class SigmaProcessService implements Callable<Map<String, Set<ActualSuppl
                         String price = driver.findElement(By.xpath("/html/body/article/div/div[3]/div/dl/div/dd/span[3]")).getText();
                         String availability = stockAvailability(stockClass);
                         System.out.println("!!!! Sigma !!!! description:"+description+"; pip:"+pip+"; availability:"+availability + "; price"+price);
-                        ActualSupplierData s = ActualSupplierData.builder().description(description).cascadePrice(!StringUtils.isEmpty(price)? Double.valueOf(price.replaceAll("£","")):null)
+                        ActualSupplierData s = ActualSupplierData.builder().description(description).supplierPrice(!StringUtils.isEmpty(price)? Double.valueOf(price.replaceAll("£","")):null)
                                 .supplier("Sigma")
                                 .definitePrice(!StringUtils.isEmpty(price)? Double.valueOf(price.replaceAll("£","")):null)
-                                .cascadeStatus(availability).code(pip)
-                                .definiteStatus(availability)
-                                .tariff(anyOfCascadeData.getTariff())
-                                .tariffAfterDeduction(anyOfCascadeData.getTariffAfterDeduction())
-                                .concession(anyOfCascadeData.getConcession())
-                                .quantity(anyOfCascadeData.getQuantity())
-                                .build();
+                                .supplierStatus(availability).code(pip)
+                                .definiteStatus(availability).code(pip).build();
                         existingData.add(s);
                         // breaking as i am not going to search for other products
                         break;
                     }
                 }catch (Exception e){
+                    System.out.println(e.getMessage());
                     System.out.println("!!!!Sigma!!!! No results for the pip "+ pip);
                 }
             }
@@ -123,8 +117,7 @@ public class SigmaProcessService implements Callable<Map<String, Set<ActualSuppl
             case "ng-binding":
                 return "Available";
             case "ng-binding low_stock":
-                //return "Low Stock";
-                return "Available";
+                return "Low Stock";
             default:
                 return null;
 

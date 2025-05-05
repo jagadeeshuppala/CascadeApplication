@@ -1,28 +1,31 @@
 package com.pharmacy.bridgwater.CascadeApp.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.pharmacy.bridgwater.CascadeApp.model.CascadeSupplier;
+import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 
 
 public class CascadeService {
 
 
 
-    /*public static void main(String[] args) throws InterruptedException, JsonProcessingException {
+    public static void main(String[] args) throws InterruptedException, JsonProcessingException {
 
-        Cascade cascade = new Cascade();
-        Map<CascadeSupplierKey, List<CascadeSupplier>> cascadeResults = cascade.getCascadeResults();
+        CascadeService cascade = new CascadeService();
+        Map<String, Set<ActualSupplierData>> cascadeResults = cascade.getCascadeResults();
+        System.out.println(cascadeResults);
 
-    }*/
-    public Map<String, List<CascadeSupplier>> getCascadeResults() throws InterruptedException, JsonProcessingException {
+    }
+    public Map<String, Set<ActualSupplierData>> getCascadeResults() throws InterruptedException, JsonProcessingException {
 
 
 
@@ -45,17 +48,28 @@ public class CascadeService {
         //cascade order pad click
         driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/header[1]/div[2]/nav[1]/div[2]/ul[1]/li[3]/a[1]")).click();
 
+        String descOfNumberOfItemsDisplayedInBanner = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]")).getText();
+        Pattern pattern = Pattern.compile("of\\s+(\\d+)");
+        Matcher matcher = pattern.matcher(descOfNumberOfItemsDisplayedInBanner);
+        Integer totalNoOfProducts = 0;
+        if (matcher.find()) {
+            String number = matcher.group(1);
+            totalNoOfProducts = Integer.valueOf(number);
+        } else {
+            System.out.println("Could not find Items Filtered: 0 of 57");
+        }
 
+        Map<String, Set<ActualSupplierData>> cascadeProductList = new LinkedHashMap<>();
+        //int actualValue = 0;
 
-        List<WebElement> numberOfLis = driver.findElements(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr"));
-        System.out.println("size is :::"+numberOfLis.size());
-        Map<String, List<CascadeSupplier>> cascadeProductList = new LinkedHashMap<>();
+        int resetValue = 0;
+        int buttonCount = 0;
+        for(int actualValue=0; actualValue<totalNoOfProducts; actualValue++){
+            resetValue++;
 
-        for(int i=1; i<=numberOfLis.size();i++){
-            String descriptionFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+i+"]/td[2]")).getText();
-            System.out.println("desc:"+descriptionFromWebsite +":");
-            /*String quantityFromWebsite =driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+i+"]/td[3]/input[1]")).getAttribute("value");;
-            System.out.println("quantity:"+quantityFromWebsite +":");*/
+            String descriptionFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+resetValue+"]/td[2]")).getText();
+            //String descriptionFromWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/form/div[10]/div[2]/div/div[1]/div/div/table/tbody/tr["+resetValue+"]/td[2]")).getText();
+            System.out.println("Product sno: "+ actualValue+ "; desc:"+descriptionFromWebsite +":");
 
             // view click
             try{
@@ -63,11 +77,11 @@ public class CascadeService {
                 JavascriptExecutor js;
                 if (driver instanceof JavascriptExecutor) {
                     js = (JavascriptExecutor)driver;
-                    WebElement element = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+i+"]/td[10]/a[2]"));
+                    WebElement element = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+resetValue+"]/td[10]/a[2]"));
                     js.executeScript("arguments[0].click();", element);
                 }
                 List<WebElement> suppliersList = driver.findElements(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr"));
-                System.out.println("size is :::"+suppliersList.size());
+                System.out.println("size of internal table :::"+suppliersList.size());
 
                 String quantityFromWebsite =  driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]")).getText().replaceAll("Quantity:","");
                 String tariffFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]")).getText().replaceAll("Tariff:","");
@@ -75,45 +89,36 @@ public class CascadeService {
                 String concessionPriceFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[3]")).getText().replaceAll("Concession Price:","");
                 System.out.println("!!!!!! QuantityFromWebsite:"+quantityFromWebsite+ "; tariff:"+tariffFromWebsite + "; tariffAfterDeduction:"+tariffAfterDeductionFromWebsite+"; concessionPrice:"+concessionPriceFromWebsite+";");
 
-                List<CascadeSupplier> cascadeSupplierList = new ArrayList<>();
+                Set<ActualSupplierData> cascadeSupplierList = new LinkedHashSet<>();
                 for(int j=1; j<=suppliersList.size();j++){
                     String supplier =driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+j+"]/td[3]")).getText();
                     String price =driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+j+"]/td[4]")).getText();
                     Double priceInDouble = price!=null?Double.valueOf(price):null;
                     String code =driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+j+"]/td[7]")).getText();
-                    String color = "No Data";
+                    String availability = "Not Available";
                     try{
-                        color = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+j+"]/td[10]/i[1]")).getAttribute("style");
-                        if("color: green;".equalsIgnoreCase(color)){
-                            color = "Available";
-                        }else if("color: red;".equalsIgnoreCase(color)){
-                            color = "Available";
+                        availability = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+j+"]/td[10]/i[1]")).getAttribute("style");
+                        if("color: green;".equalsIgnoreCase(availability)){
+                            availability = "Available";
+                        }else if("color: red;".equalsIgnoreCase(availability)){
+                            availability = "Not Available";
                         }else{
-                            color = "please check if there is any change from website on css";
+                            availability = "please check if there is any change from website on css";
                         }
                     }catch (Exception e){
-                        System.out.println("please check what is the status from website I value is "+ i + "; J value is "+j);
+                        //e.printStackTrace();
+                        System.out.println("please check what is the status from website I value is "+ actualValue + "; J value is "+j);
                     }
 
-                    //List<CascadeSupplier> supplierListAlreadyAdded = cascadeProductList.get(descriptionFromWebsite);
-                    if(!cascadeSupplierList.isEmpty()){
-                        List<CascadeSupplier>  supplierExist = cascadeSupplierList.stream()
-                                .filter(sl -> supplier.equalsIgnoreCase(sl.getSupplier()))
-                                .collect(Collectors.toList());
-                        if( !supplierExist.isEmpty()){
-                            CascadeSupplier existingSupplierEntry = supplierExist.get(0);
-                            if(priceInDouble.compareTo(existingSupplierEntry.getPrice()) < 0){
-                                System.out.println("!!!!!!Already cheaper from this supplier is coming,"+existingSupplierEntry.getPrice()+ "so removing the existing one"+price);
-                                cascadeSupplierList.remove(existingSupplierEntry);
-                            }
-
-                        }
-                    }
-                    cascadeSupplierList.add(CascadeSupplier.builder().supplier(supplier).price(priceInDouble).code(code).status(color)
-                                    .quantity(!StringUtils.isEmpty(quantityFromWebsite)?Integer.valueOf(quantityFromWebsite.trim()):null)
-                                    .tariff(!StringUtils.isEmpty(tariffFromWebsite)?Double.valueOf(tariffFromWebsite.trim()):null)
-                                    .tariffAfterDeduction(!StringUtils.isEmpty(tariffAfterDeductionFromWebsite)?Double.valueOf( tariffAfterDeductionFromWebsite.trim()):null)
-                                    .concession(!StringUtils.isEmpty(concessionPriceFromWebsite)?Double.valueOf(tariffFromWebsite.trim()):null)
+                    cascadeSupplierList.add(ActualSupplierData.builder()
+                            .supplier(supplier).cascadePrice(priceInDouble).code(!StringUtils.isEmpty(code)?code:null).cascadeStatus(availability)
+                            .definitePrice(priceInDouble)
+                            .definiteStatus(availability)
+                            .description(descriptionFromWebsite)
+                            .quantity(!StringUtils.isEmpty(quantityFromWebsite)?Integer.valueOf(quantityFromWebsite.trim()):null)
+                            .tariff(!StringUtils.isEmpty(tariffFromWebsite)?Double.valueOf(tariffFromWebsite.trim()):null)
+                            .tariffAfterDeduction(!StringUtils.isEmpty(tariffAfterDeductionFromWebsite)?Double.valueOf( tariffAfterDeductionFromWebsite.trim()):null)
+                            .concession(!StringUtils.isEmpty(concessionPriceFromWebsite)?Double.valueOf(tariffFromWebsite.trim()):null)
                             .build());
                 }
                 // close button click
@@ -124,14 +129,64 @@ public class CascadeService {
             }catch (Exception e){
                 e.printStackTrace();
             }
+            if((actualValue+1)%20 == 0){
+                resetValue = 0;
+                JavascriptExecutor js;
+                if (driver instanceof JavascriptExecutor) {
+                    js = (JavascriptExecutor)driver;
+                    WebElement element = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/ul[1]/li[6]/a[1]"));
+                    js.executeScript("arguments[0].click();", element);
+
+                    //js.executeScript(element.click(););
+                }
+
+            }
+
         }
+
+        /*while(actualValue< totalNoOfProducts){
+            //List<WebElement> numberOfLis = driver.findElements(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr"));
+            List<WebElement> numberOfLis = driver.findElements(By.xpath("/html/body/div[1]/div[2]/form/div[10]/div[2]/div/div[1]/div/div/table/tbody/tr"));
+
+            System.out.println("size of external table :::"+numberOfLis.size());
+
+
+            for(int i=1; i<=numberOfLis.size() && actualValue<= totalNoOfProducts; i++){
+                actualValue++;
+
+            }
+
+            try{
+                JavascriptExecutor js;
+                if (driver instanceof JavascriptExecutor) {
+                    js = (JavascriptExecutor)driver;
+                    WebElement element = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/ul[1]/li[4]/a[1]"));
+                    System.out.println("!!!!!!!!!!!Clicking on next button!!!!!!!!!!!!!!");
+                    js.executeScript("arguments[0].click();", element);
+                    *//*if(element.isEnabled()){
+                        System.out.println("!!!!!!!!!!!Next button is enabled!!!!!!!!!!!!!!");
+                        js.executeScript("arguments[0].click();", element);
+                    }else{
+                        System.out.println("!!!!!!!!!Next button is Not enabled!!!!!!!!!!!!!");
+                    }*//*
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                System.out.println("No next button");
+            }
+
+
+        }*/
+
+
+
+
+
         System.out.println("==================================================================");
         System.out.println("cascadeProductList"+cascadeProductList);
         System.out.println("==================================================================");
 
-/*        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String json = ow.writeValueAsString(cascadeProductList);
-        System.out.println(json);*/
+
 
         //logoff
         driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/header[1]/div[1]/section[1]/form[1]/a[1]")).click();
