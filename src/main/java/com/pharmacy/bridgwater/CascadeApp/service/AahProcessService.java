@@ -165,8 +165,8 @@ public class AahProcessService implements Callable<Map<String, Set<ActualSupplie
                         //String availablity = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[2]/span[1]/div[1]/div[2]")).getText();
                         String availablityFromWebsite = driver.findElement(By.xpath("//div[@class='avail-col-text avail-col-width']")).getText();
                         System.out.println("!!!!AAH !!! PipCode:" + pipCode + "; descFromWebsite:" + descriptionFromWebsite + "; priceFromWebsite:" + priceFromWebsite + "; availability:" + availablityFromWebsite);
-                        //aahData.setCascadePrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
-                        aahData.setCascadePrice(0.1);
+                        aahData.setCascadePrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
+                        //aahData.setCascadePrice(0.1);
                         aahData.setCascadeStatus(!StringUtils.isEmpty(availablityFromWebsite) ? stockAvailability(availablityFromWebsite) : null);
                         aahData.setSupplier("AAH Pharmaceuticals");
                         success = true;

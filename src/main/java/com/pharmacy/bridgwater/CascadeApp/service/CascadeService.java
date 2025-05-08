@@ -58,14 +58,14 @@ public class CascadeService {
         String descOfNumberOfItemsDisplayedInBanner = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]")).getText();
         Pattern pattern = Pattern.compile("of\\s+(\\d+)");
         Matcher matcher = pattern.matcher(descOfNumberOfItemsDisplayedInBanner);
-        int totalNoOfProducts = 5;
+        int totalNoOfProducts = 0;
 
-        /*if (matcher.find()) {
+        if (matcher.find()) {
             String number = matcher.group(1);
             totalNoOfProducts = Integer.valueOf(number);
         } else {
             System.out.println("Could not find Items Filtered: 0 of 57");
-        }*/
+        }
 
 
         Map<String, Set<ActualSupplierData>> cascadeProductList = new LinkedHashMap<>();

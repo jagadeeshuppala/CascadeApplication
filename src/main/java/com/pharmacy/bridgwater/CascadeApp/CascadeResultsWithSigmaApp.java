@@ -120,7 +120,7 @@ public class CascadeResultsWithSigmaApp {
                 Callable<Map<String, Set<ActualSupplierData>>> tridentWorker = new TridentProcessService(unprocessedTridentResults);
                 Future<Map<String, Set<ActualSupplierData>>> tridentFuture = executor.submit(tridentWorker);
 
-                Callable<Map<String, Set<ActualSupplierData>>> bestwayWorker = new BestwayProcessService(unprocessedTridentResults);
+                Callable<Map<String, Set<ActualSupplierData>>> bestwayWorker = new BestwayProcessService(unprocessedBestwayResults);
                 Future<Map<String, Set<ActualSupplierData>>> bestwayFuture = executor.submit(bestwayWorker);
 
 

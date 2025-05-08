@@ -28,14 +28,16 @@ public class BestwayProcessService implements Callable<Map<String, Set<ActualSup
         this.cascadeDataForBestway = cascadeDataForBestway;
     }
 
-    /*public static void main(String args[]) throws InterruptedException, JsonProcessingException {
+    public static void main(String args[]) throws InterruptedException, JsonProcessingException {
         Long startTime = System.currentTimeMillis();
-        Map<String,Set<ActualSupplierData>> cascadeDataForBestway = new LinkedHashMap<>();
 
-        BestwayProcessService process = new BestwayProcessService();
-        CascadeServiceNew cascade = new CascadeServiceNew();
+        CascadeService cascade = new CascadeService();
         Map<String, Set<ActualSupplierData>> cascadeResultsMap = cascade.getCascadeResults();
-        *//*for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResultsMap.entrySet()) {
+
+
+
+        Map<String,Set<ActualSupplierData>> cascadeDataForBestway = new LinkedHashMap<>();
+        for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResultsMap.entrySet()) {
             String key = entry.getKey();
             Set<ActualSupplierData> bestwayCascadeSet = entry.getValue().stream().filter(cs ->"Bestway MedHub".equalsIgnoreCase(cs.getSupplier())
                             && !StringUtils.isEmpty(cs.getCode())
@@ -43,9 +45,11 @@ public class BestwayProcessService implements Callable<Map<String, Set<ActualSup
                     .map(v -> ActualSupplierData.builder().description(key).cascadePrice(v.getCascadePrice()).cascadeStatus(v.getCascadeStatus()).code(v.getCode()).build())
                     .collect(Collectors.toSet());
             cascadeDataForBestway.put(key, bestwayCascadeSet);
-        }*//*
+        }
 
-        *//*cascadeDataForBestway.put("Levothyroxine sodium 100microgram tablets Pk: 28",
+        BestwayProcessService process = new BestwayProcessService(cascadeDataForBestway);
+
+       /* cascadeDataForBestway.put("Levothyroxine sodium 100microgram tablets Pk: 28",
                 new HashSet<>(Arrays.asList(ActualSupplierData.builder().description("Levothyroxine sodium 100microgram tablets Pk: 28").code("1022144").cascadePrice(Double.valueOf("20.00")).cascadeStatus("Available").build()
                         //,BestwayData.builder().code("6177560").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build()
                 )
@@ -59,12 +63,12 @@ public class BestwayProcessService implements Callable<Map<String, Set<ActualSup
         cascadeDataForBestway.put("Carbocisteine 250mg/5ml oral solution sugar free Pk: 300",
                 new HashSet<>(Arrays.asList(ActualSupplierData.builder().code("7365323").cascadePrice(Double.valueOf("4.40")).cascadeStatus("Available").build()
                 )
-                ));*//*
-        Map<String,Set<ActualSupplierData>> processedTridentData = process.processBestway(cascadeResultsMap);
-        System.out.println(processedTridentData);
+                ));*/
+        Map<String, Set<ActualSupplierData>> call = process.call();
+        System.out.println(call);
         Long endTime = System.currentTimeMillis();
         System.out.println("Total time taken for the whole process is "+ (endTime-startTime)/1000 +" seconds");
-    }*/
+    }
 
 
 
@@ -138,8 +142,8 @@ public class BestwayProcessService implements Callable<Map<String, Set<ActualSup
 
                         System.out.println("!!!!Bestway !!! Description:"+descFromBestwayWebsite+"; price:"+priceFromBestwayWebsite+"; stock"+stockAvailability(stockFromBestwayWebsite)+ "; pipcode"+pipCodeFromBestwayWebsite);
                         if(!StringUtils.isEmpty(pipCodeFromBestwayWebsite) && pipCodeFromBestwayWebsite.equals(!StringUtils.isEmpty(bestwayData.getCode()) ? bestwayData.getCode() : "")){
-                            //bestwayData.setCascadePrice(!StringUtils.isEmpty(priceFromBestwayWebsite) ? Double.valueOf(priceFromBestwayWebsite.replace("Price: ","").trim()):null);
-                            bestwayData.setCascadePrice(Double.valueOf(-0.4));
+                            bestwayData.setCascadePrice(!StringUtils.isEmpty(priceFromBestwayWebsite) ? Double.valueOf(priceFromBestwayWebsite.replace("Price: ","").trim()):null);
+                            //bestwayData.setCascadePrice(Double.valueOf(-0.4));
                             bestwayData.setCascadeStatus(stockAvailability(stockFromBestwayWebsite));
                             System.out.println("!!!!Bestway !!! Found the match at:" +actualJvalue);
                             break;

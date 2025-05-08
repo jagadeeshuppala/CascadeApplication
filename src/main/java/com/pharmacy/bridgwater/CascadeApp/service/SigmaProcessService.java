@@ -89,8 +89,8 @@ public class SigmaProcessService implements Callable<Map<String, Set<ActualSuppl
                         String availability = stockAvailability(stockClass);
                         System.out.println("!!!! Sigma !!!! description:"+description+"; pip:"+pip+"; availability:"+availability + "; price"+price);
                         ActualSupplierData s = ActualSupplierData.builder().description(description)
-                                //.cascadePrice(!StringUtils.isEmpty(price)? Double.valueOf(price.replaceAll("£","")):null)
-                                .cascadePrice(0.2)
+                                .cascadePrice(!StringUtils.isEmpty(price)? Double.valueOf(price.replaceAll("£","")):null)
+                                //.cascadePrice(0.2)
                                 .supplier("Sigma")
                                 //.definitePrice(!StringUtils.isEmpty(price)? Double.valueOf(price.replaceAll("£","")):null)
                                 .cascadeStatus(availability).code(pip)

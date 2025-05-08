@@ -195,8 +195,8 @@ public class TridentProcessService implements Callable<Map<String, Set<ActualSup
                     }
 
                     System.out.println("!!!!Trident !!!PipCode:"+pipCode+"; descFromWebsite:"+descriptionFromWebsite+ "; priceFromWebsite:"+ priceFromWebsite+ "; availability:"+availablityFromWebsite);
-                    //tridentData.setCascadePrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
-                    tridentData.setCascadePrice(0.3);
+                    tridentData.setCascadePrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
+                    //tridentData.setCascadePrice(0.3);
                     tridentData.setCascadeStatus(!StringUtils.isEmpty(availablityFromWebsite)?stockAvailability(availablityFromWebsite):null);
 
 
