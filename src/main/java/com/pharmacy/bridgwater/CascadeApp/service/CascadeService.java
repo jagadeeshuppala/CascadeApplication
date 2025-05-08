@@ -58,7 +58,7 @@ public class CascadeService {
         String descOfNumberOfItemsDisplayedInBanner = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]")).getText();
         Pattern pattern = Pattern.compile("of\\s+(\\d+)");
         Matcher matcher = pattern.matcher(descOfNumberOfItemsDisplayedInBanner);
-        int totalNoOfProducts = 10;
+        int totalNoOfProducts = 5;
 
         /*if (matcher.find()) {
             String number = matcher.group(1);

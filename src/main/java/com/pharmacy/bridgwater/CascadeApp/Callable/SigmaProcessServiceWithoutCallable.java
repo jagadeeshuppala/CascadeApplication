@@ -74,14 +74,16 @@ public class SigmaProcessServiceWithoutCallable  {
 
 
 
-                WebElement pipTextBox = driver.findElement(By.xpath("/html/body/article/div/div[1]/form/div[1]/div[2]/input"));
-                pipTextBox.clear();
-                pipTextBox.sendKeys(pip);
-                pipTextBox.sendKeys("\n\n");
-                Thread.sleep(3000);
+
 
 
                 try{
+                    WebElement pipTextBox = driver.findElement(By.xpath("/html/body/article/div/div[1]/form/div[1]/div[2]/input"));
+                    pipTextBox.clear();
+                    pipTextBox.sendKeys(pip);
+                    pipTextBox.sendKeys("\n\n");
+                    Thread.sleep(3000);
+
                     String stockClass = driver.findElement(By.xpath("/html/body/article/div/div[3]/div/dl/div/dt")).getAttribute("class");
                     if(!stockClass.equalsIgnoreCase("ng-binding special")){
                         String description = driver.findElement(By.xpath("/html/body/article/div/div[3]/div/dl/div/dt")).getText();
@@ -104,8 +106,14 @@ public class SigmaProcessServiceWithoutCallable  {
             }
             //sigmaProcessedData.put(entry.getKey(), sigmaData);
         }
+        //logoff
+        try{
+            driver.findElement(By.xpath("/html[1]/body[1]/nav[1]/ul[1]/li[2]/a[1]")).click();
+        }catch (Exception e){
+            System.out.println("!!!Sigma!!! Failed to loggoff");
+        }
 
-        driver.findElement(By.xpath("/html[1]/body[1]/nav[1]/ul[1]/li[2]/a[1]")).click();
+        driver.close();
         return cascadeDataForSigma;
 
     }

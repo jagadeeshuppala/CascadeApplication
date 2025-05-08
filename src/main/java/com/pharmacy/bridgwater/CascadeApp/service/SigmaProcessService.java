@@ -74,12 +74,14 @@ public class SigmaProcessService implements Callable<Map<String, Set<ActualSuppl
                 Thread.sleep(1000);
                 System.out.println("!!!!!Sigma!!!!! Searching for pip code "+pip+":");
 
-                WebElement pipTextBox = driver.findElement(By.xpath("/html/body/article/div/div[1]/form/div[1]/div[2]/input"));
-                pipTextBox.clear();
-                pipTextBox.sendKeys(pip);
-                pipTextBox.sendKeys("\n\n");
-                Thread.sleep(5000);
+
                 try{
+                    WebElement pipTextBox = driver.findElement(By.xpath("/html/body/article/div/div[1]/form/div[1]/div[2]/input"));
+                    pipTextBox.clear();
+                    pipTextBox.sendKeys(pip);
+                    pipTextBox.sendKeys("\n\n");
+                    Thread.sleep(5000);
+
                     String stockClass = driver.findElement(By.xpath("/html/body/article/div/div[3]/div/dl/div/dt")).getAttribute("class");
                     if(!stockClass.equalsIgnoreCase("ng-binding special")){
                         String description = driver.findElement(By.xpath("/html/body/article/div/div[3]/div/dl/div/dt")).getText();
@@ -108,8 +110,12 @@ public class SigmaProcessService implements Callable<Map<String, Set<ActualSuppl
             }
             sigmaOnlyProcessedData.put(entry.getKey(), sigmaOnlyData);
         }
-
-        driver.findElement(By.xpath("/html[1]/body[1]/nav[1]/ul[1]/li[2]/a[1]")).click();
+        try {
+            driver.findElement(By.xpath("/html[1]/body[1]/nav[1]/ul[1]/li[2]/a[1]")).click();
+        }catch (Exception e){
+            System.out.println("!!!Sigma!!! Failed to logoff");
+        }
+        driver.close();
         return sigmaOnlyProcessedData;
 
     }
