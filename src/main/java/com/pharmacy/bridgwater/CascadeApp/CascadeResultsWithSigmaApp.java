@@ -1,3 +1,5 @@
+package com.pharmacy.bridgwater.CascadeApp;
+
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
 import com.pharmacy.bridgwater.CascadeApp.service.*;
 import org.apache.commons.lang3.StringUtils;
@@ -20,21 +22,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 
 
 public class CascadeResultsWithSigmaApp {
-        public static String SUPPLIER_AAH = "AAH Pharmaceuticals";
-        public static String SUPPLIER_BESTWAY = "Bestway MedHub";
-        public static String SUPPLIER_BNS = "B&S Colorama";
-        public static String SUPPLIER_LEXON = "Lexon UK";
-        public static String SUPPLIER_OTC = "OTC";
-        public static String SUPPLIER_SIGMA = "Sigma";
-        public static String SUPPLIER_TRIDENT = "Trident Pharmaceuticals";
-        public static String SUPPLIER_ALLIANCE = "Alliance Healthcare";
 
-        public static String SUPPLIER_STATUS_AVAILABLE = "Available";
-        public static String SUPPLIER_STATUS_NOT_AVAILABLE = "Not Available";
 
         public static void main(String[] args) throws Exception{
                 Long startTime = System.currentTimeMillis();
@@ -80,21 +73,100 @@ public class CascadeResultsWithSigmaApp {
 
                 CascadeService cascade = new CascadeService();
                 Map<String, Set<ActualSupplierData>> cascadeResults =  cascade.getCascadeResults();
-
-                SigmaProcessService sigmaProcessService = new SigmaProcessService(cascadeResults);
-                Map<String, Set<ActualSupplierData>> sigmaOnlyResults = sigmaProcessService.call();
-
-                Map<String,Set<ActualSupplierData>> cascadeDataWithSigmaDataAdded = new LinkedHashMap<>();
-
-                //Adding sigma results to the main list
+                Map<String, Set<String>> sigmaPipCodes =  new LinkedHashMap<>();
                 for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
+                        sigmaPipCodes.put(entry.getKey(), entry.getValue().stream().filter(v -> !StringUtils.isEmpty(v.getCode())).map(ActualSupplierData::getCode).collect(Collectors.toSet()));
+                }
+
+
+
+                ExecutorService executor = Executors.newFixedThreadPool(3);
+
+
+                //Filter aahResults and pass it to Aah service to fetch the aah results
+                Map<String, Set<ActualSupplierData>> unprocessedAahResults = new LinkedHashMap<>();
+                for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
+                        String key = entry.getKey();
+                        Set<ActualSupplierData> onlyAahUnprocessedSet = entry.getValue().stream().filter(v -> !StringUtils.isEmpty(v.getCode()))
+                                .filter( v -> SUPPLIER_AAH.equalsIgnoreCase(v.getSupplier()))
+                                .collect(Collectors.toSet());
+                        unprocessedAahResults.put(key, onlyAahUnprocessedSet);
+                }
+
+                //Filter tridentResults and pass it to Trident service to fetch the aah results
+                Map<String, Set<ActualSupplierData>> unprocessedTridentResults = new LinkedHashMap<>();
+                for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
+                        String key = entry.getKey();
+                        Set<ActualSupplierData> onlyTridentUnprocessedSet = entry.getValue().stream().filter(v -> !StringUtils.isEmpty(v.getCode()))
+                                .filter( v -> SUPPLIER_TRIDENT.equalsIgnoreCase(v.getSupplier()))
+                                .collect(Collectors.toSet());
+                        unprocessedTridentResults.put(key, onlyTridentUnprocessedSet);
+                }
+
+                //Filter bestway results and pass it to Bestway service to fetch the bestway results
+                Map<String, Set<ActualSupplierData>> unprocessedBestwayResults = new LinkedHashMap<>();
+                for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
+                        String key = entry.getKey();
+                        Set<ActualSupplierData> onlyBestwayUnprocessedSet = entry.getValue().stream().filter(v -> !StringUtils.isEmpty(v.getCode()))
+                                .filter( v -> SUPPLIER_BESTWAY.equalsIgnoreCase(v.getSupplier()))
+                                .collect(Collectors.toSet());
+                        unprocessedBestwayResults.put(key, onlyBestwayUnprocessedSet);
+                }
+
+                Callable<Map<String, Set<ActualSupplierData>>> aahWorker = new AahProcessService(unprocessedAahResults);
+                Future<Map<String, Set<ActualSupplierData>>> aahFuture = executor.submit(aahWorker);
+
+
+                Callable<Map<String, Set<ActualSupplierData>>> tridentWorker = new TridentProcessService(unprocessedTridentResults);
+                Future<Map<String, Set<ActualSupplierData>>> tridentFuture = executor.submit(tridentWorker);
+
+                Callable<Map<String, Set<ActualSupplierData>>> bestwayWorker = new BestwayProcessService(unprocessedTridentResults);
+                Future<Map<String, Set<ActualSupplierData>>> bestwayFuture = executor.submit(bestwayWorker);
+
+
+                Callable<Map<String, Set<ActualSupplierData>>> sigmaWorker = new SigmaProcessService(sigmaPipCodes);
+                Future<Map<String, Set<ActualSupplierData>>>  sigmaFuture = executor.submit(sigmaWorker);
+
+
+                executor.shutdown();
+
+                Map<String, Set<ActualSupplierData>> aahProcessedResults = aahFuture.get();
+                Map<String, Set<ActualSupplierData>> tridentProcessedResults = tridentFuture.get();
+                Map<String, Set<ActualSupplierData>> bestwayProcessedResults = bestwayFuture.get();
+                Map<String, Set<ActualSupplierData>> sigmaProcessedResults = sigmaFuture.get();
+
+
+
+
+
+
+
+
+                /*SigmaProcessService sigmaProcessService = new SigmaProcessService(cascadeResults);
+                Map<String, Set<ActualSupplierData>> sigmaOnlyResults = sigmaProcessService.call();*/
+
+                System.out.println(cascadeResults);
+
+                //replace cascade results with aahProcessed results
+                for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
+                        String key = entry.getKey();
+
+                        //remove
+
+                        // add sigma processed results
+                        entry.getValue().addAll(sigmaProcessedResults.get(key));
+                }
+
+                System.out.println(cascadeResults);
+
+                //Adding sigma results to cascadeResults
+                /*for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
                         String key = entry.getKey();
                         Set<ActualSupplierData> sigmaResults = sigmaOnlyResults.get(key);
                         Set<ActualSupplierData> value = entry.getValue();
                         //Adding sigma results
                         value.addAll(sigmaResults);
-                        cascadeDataWithSigmaDataAdded.put(key, value);
-                }
+                }*/
 
                 int i =0;
                 Row row0 = my_sheet.createRow(0);

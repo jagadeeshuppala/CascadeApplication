@@ -87,84 +87,82 @@ public class BestwayProcessService implements Callable<Map<String, Set<ActualSup
         Thread.sleep(1000);
 
 
-
+        int totalNoOfRecords = cascadeDataForBestway.size();
         for(Map.Entry<String,Set<ActualSupplierData>> entry: cascadeDataForBestway.entrySet()){
             String description = entry.getKey();
             Set<ActualSupplierData> bestwayDataSet = entry.getValue();
 
             for(ActualSupplierData bestwayData : bestwayDataSet){
-                if("Bestway MedHub".equalsIgnoreCase(bestwayData.getSupplier())  && !StringUtils.isEmpty(bestwayData.getCode())){
-                    System.out.println("!!!!Bestway!!!! Searching for pip code "+bestwayData.getDescription()+":");
-                    Thread.sleep(1000);
-                    String bestwayDescription = bestwayData.getDescription();
-                    String[] descriptionTokenizer = bestwayDescription.split(" ");
-                    // search box
-                    driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/div[3]/div[3]/form[1]/div[1]/div[1]/div[1]/div[1]/input[1]")).clear();
-                    driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/div[3]/div[3]/form[1]/div[1]/div[1]/div[1]/div[1]/input[1]")).sendKeys(descriptionTokenizer[0]);
-                    driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/div[3]/div[3]/form[1]/div[1]/div[1]/div[1]/div[1]/input[1]")).sendKeys(Keys.RETURN);
-                    Thread.sleep(1000);
+                System.out.println("!!!!!Bestway!!!!! still total no of records "+ totalNoOfRecords-- +":");
+                System.out.println("!!!!Bestway!!!! Searching for pip code "+bestwayData.getDescription()+":");
+                Thread.sleep(1000);
+                String bestwayDescription = bestwayData.getDescription();
+                String[] descriptionTokenizer = bestwayDescription.split(" ");
+                // search box
+                driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/div[3]/div[3]/form[1]/div[1]/div[1]/div[1]/div[1]/input[1]")).clear();
+                driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/div[3]/div[3]/form[1]/div[1]/div[1]/div[1]/div[1]/input[1]")).sendKeys(descriptionTokenizer[0]);
+                driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/div[3]/div[3]/form[1]/div[1]/div[1]/div[1]/div[1]/input[1]")).sendKeys(Keys.RETURN);
+                Thread.sleep(1000);
 
 
-                    //check if any results came back
-                    //List<WebElement> productTableListElement = driver.findElements(By.xpath("//*[@id=\"TabsId-prodListView\"]"));
-                    String textDisplayedAslistOfNumber = driver.findElement(By.xpath("//*[@id=\"content-container\"]/div/div[2]/div[2]")).getText();
-                    System.out.println("textDisplayedAslistOfNumber:"+textDisplayedAslistOfNumber);
-                    Pattern pattern = Pattern.compile("of\\s+(\\d+)");
-                    Matcher matcher = pattern.matcher(textDisplayedAslistOfNumber);
-                    Integer numberOfProducts = 0;
-                    if (matcher.find()) {
-                        String number = matcher.group(1);
-                        numberOfProducts = Integer.valueOf(number);
-                    } else {
-                        System.out.println("No results found.");
-                    }
-                    System.out.println(textDisplayedAslistOfNumber);
-                    //for(int i=0; i<numberOfProducts  ; i++) {
-                    //List<WebElement> productListElement = driver.findElements(By.xpath("//*[@id=\"item\"]"));
+                //check if any results came back
+                //List<WebElement> productTableListElement = driver.findElements(By.xpath("//*[@id=\"TabsId-prodListView\"]"));
+                String textDisplayedAslistOfNumber = driver.findElement(By.xpath("//*[@id=\"content-container\"]/div/div[2]/div[2]")).getText();
+                System.out.println("textDisplayedAslistOfNumber:"+textDisplayedAslistOfNumber);
+                Pattern pattern = Pattern.compile("of\\s+(\\d+)");
+                Matcher matcher = pattern.matcher(textDisplayedAslistOfNumber);
+                Integer numberOfProducts = 0;
+                if (matcher.find()) {
+                    String number = matcher.group(1);
+                    numberOfProducts = Integer.valueOf(number);
+                } else {
+                    System.out.println("No results found.");
+                }
+                System.out.println(textDisplayedAslistOfNumber);
+                //for(int i=0; i<numberOfProducts  ; i++) {
+                //List<WebElement> productListElement = driver.findElements(By.xpath("//*[@id=\"item\"]"));
 
 
-                    int actualJvalue =1;
-                    for(int j = 1; j<= numberOfProducts && actualJvalue <=numberOfProducts; j++){
-                        System.out.println("Acutal J value "+actualJvalue + " prodListElement size "+ numberOfProducts);
-                        actualJvalue++;
+                int actualJvalue =1;
+                for(int j = 1; j<= numberOfProducts && actualJvalue <=numberOfProducts; j++){
+                    System.out.println("Acutal J value "+actualJvalue + " prodListElement size "+ numberOfProducts);
+                    actualJvalue++;
 
-                        try{
-                            String descFromBestwayWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[1]")).getText();
-                            String priceFromBestwayWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[7]")).getText();
-                            String pipCodeFromBestwayWebsiteWithCat = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[6]")).getText();
-                            String stockFromBestwayWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[9]/img")).getAttribute("src");
+                    try{
+                        String descFromBestwayWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[1]")).getText();
+                        String priceFromBestwayWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[7]")).getText();
+                        String pipCodeFromBestwayWebsiteWithCat = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[6]")).getText();
+                        String stockFromBestwayWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[9]/img")).getAttribute("src");
 
-                            String pipCodeFromBestwayWebsite = !StringUtils.isEmpty(pipCodeFromBestwayWebsiteWithCat)? pipCodeFromBestwayWebsiteWithCat.split(" ")[1]:null;
+                        String pipCodeFromBestwayWebsite = !StringUtils.isEmpty(pipCodeFromBestwayWebsiteWithCat)? pipCodeFromBestwayWebsiteWithCat.split(" ")[1]:null;
 
-                            System.out.println("!!!!Bestway !!! Description:"+descFromBestwayWebsite+"; price:"+priceFromBestwayWebsite+"; stock"+stockAvailability(stockFromBestwayWebsite)+ "; pipcode"+pipCodeFromBestwayWebsite);
-                            if(!StringUtils.isEmpty(pipCodeFromBestwayWebsite) && pipCodeFromBestwayWebsite.equals(!StringUtils.isEmpty(bestwayData.getCode()) ? bestwayData.getCode() : "")){
-                                bestwayData.setSupplierPrice(!StringUtils.isEmpty(priceFromBestwayWebsite) ? Double.valueOf(priceFromBestwayWebsite.replace("Price: ","").trim()):null);
-                                bestwayData.setDefinitePrice(!StringUtils.isEmpty(priceFromBestwayWebsite) ? Double.valueOf(priceFromBestwayWebsite.replace("Price: ","").trim()):null);
-                                bestwayData.setSupplierStatus(stockAvailability(stockFromBestwayWebsite));
-                                bestwayData.setDefiniteStatus(stockAvailability(stockFromBestwayWebsite));
-                                bestwayData.setSupplier("Bestway MedHub");
-                                System.out.println("!!!!Bestway !!! Found the match at:" +actualJvalue);
-                                break;
-                            }
-                            if(j%6 == 0){
-                                System.out.println("Into this loop");
-                                j=1;
-                                //click on next button
-                                try{
-                                    driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/div[1]/div[2]/div[4]/div[1]/ul[1]/li[3]/a[1]")).click();
-                                    Thread.sleep(1000);
-                                }catch (Exception e){
-                                    //e.printStackTrace();
-                                    System.out.println("!!!!Bestway !!! There is no next button");
-                                }
-                            }
-
-                        }catch (Exception e){
-                            e.printStackTrace();
-                            System.out.println("!!!!Bestway !!! It might be end of the list");
+                        System.out.println("!!!!Bestway !!! Description:"+descFromBestwayWebsite+"; price:"+priceFromBestwayWebsite+"; stock"+stockAvailability(stockFromBestwayWebsite)+ "; pipcode"+pipCodeFromBestwayWebsite);
+                        if(!StringUtils.isEmpty(pipCodeFromBestwayWebsite) && pipCodeFromBestwayWebsite.equals(!StringUtils.isEmpty(bestwayData.getCode()) ? bestwayData.getCode() : "")){
+                            //bestwayData.setCascadePrice(!StringUtils.isEmpty(priceFromBestwayWebsite) ? Double.valueOf(priceFromBestwayWebsite.replace("Price: ","").trim()):null);
+                            bestwayData.setCascadePrice(Double.valueOf(-0.4));
+                            bestwayData.setCascadeStatus(stockAvailability(stockFromBestwayWebsite));
+                            System.out.println("!!!!Bestway !!! Found the match at:" +actualJvalue);
+                            break;
                         }
+                        if(j%6 == 0){
+                            System.out.println("Into this loop");
+                            j=1;
+                            //click on next button
+                            try{
+                                driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/div[1]/div[2]/div[4]/div[1]/ul[1]/li[3]/a[1]")).click();
+                                Thread.sleep(1000);
+                            }catch (Exception e){
+                                //e.printStackTrace();
+                                System.out.println("!!!!Bestway !!! There is no next button");
+                            }
+                        }
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        System.out.println("!!!!Bestway !!! It might be end of the list");
                     }
                 }
+
 
 
 
@@ -182,6 +180,7 @@ public class BestwayProcessService implements Callable<Map<String, Set<ActualSup
             System.out.println("!!!!Bestway !!! Falied to click on the logout");
         }
 
+        driver.close();
 
         return cascadeDataForBestway;
 
