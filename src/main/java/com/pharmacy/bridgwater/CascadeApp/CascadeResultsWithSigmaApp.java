@@ -39,6 +39,14 @@ public class CascadeResultsWithSigmaApp {
         public static final String ORIGINAL_FILE_NAME = "/Users/juppala/MyNewWorkspace/CascadeApplication/src/main/resources/Supp codes.xlsx";
         public static final String COPIED_FILE_NAME = "/Users/juppala/MyNewWorkspace/CascadeApplication/src/main/resources/Supp codes_copy.xlsx";
 
+        public static final String CASCADE_UPLOAD_FILE_NAME = "upload.csv";
+        public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
+
+
+        public static final int ORDER_LIST_DESC = 0;
+        public static final int ORDER_LIST_PIP = 1;
+        public static final int ORDER_LIST_QTY = 4;
+
 
         public static void main(String[] args) throws Exception{
                 Long startTime = System.currentTimeMillis();
