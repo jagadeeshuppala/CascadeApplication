@@ -14,18 +14,18 @@ public class ActualSupplierData {
     private String supplier;
     private String description;
     private Double cascadePrice;
-    private Double supplierPrice;
+
     private String code;
     private String cascadeStatus;
-    private String supplierStatus;
+
 
     private Integer quantity;
     private Double tariff;
     private Double tariffAfterDeduction;
     private Double concession;
 
-    private Double definitePrice;
-    private String definiteStatus;
+
+    private String orderListPip;
 
     /*@Override
     public boolean equals(Object o) {
@@ -39,16 +39,15 @@ public class ActualSupplierData {
         return Objects.hash(description, cascadePrice, cascadeStatus);
     }*/
 
-    @Override
+   /* @Override
     public String toString() {
         return "ActualSupplierData{" +
                 "supplier='" + supplier + '\'' +
                 ", description='" + description + '\'' +
                 ", cascadePrice=" + cascadePrice +
-                ", supplierPrice=" + supplierPrice +
+
                 ", code='" + code + '\'' +
                 ", cascadeStatus='" + cascadeStatus + '\'' +
-                ", supplierStatus='" + supplierStatus + '\'' +
                 ", quantity=" + quantity +
                 ", tariff=" + tariff +
                 ", tariffAfterDeduction=" + tariffAfterDeduction +
@@ -56,5 +55,5 @@ public class ActualSupplierData {
                 ", definitePrice=" + definitePrice +
                 ", definiteStatus='" + definiteStatus + '\'' +
                 '}';
-    }
+    }*/
 }

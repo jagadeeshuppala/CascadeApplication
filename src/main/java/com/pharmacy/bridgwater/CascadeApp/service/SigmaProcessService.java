@@ -3,6 +3,7 @@ package com.pharmacy.bridgwater.CascadeApp.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
+import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
 import com.pharmacy.bridgwater.CascadeApp.model.SigmaData;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
@@ -15,9 +16,9 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 
-public class SigmaProcessService implements Callable<Map<String, Set<ActualSupplierData>>> {
-    Map<String,Set<String>> cascadeDataForSigma;
-    public SigmaProcessService(Map<String,Set<String>> cascadeDataForSigma){
+public class SigmaProcessService implements Callable<Map<OrderListKey, Set<ActualSupplierData>>> {
+    Map<OrderListKey,Set<String>> cascadeDataForSigma;
+    public SigmaProcessService(Map<OrderListKey,Set<String>> cascadeDataForSigma){
         this.cascadeDataForSigma = cascadeDataForSigma;
     }
 
@@ -49,9 +50,9 @@ public class SigmaProcessService implements Callable<Map<String, Set<ActualSuppl
 
 
     @Override
-    public Map<String,Set<ActualSupplierData>> call() throws InterruptedException {
+    public Map<OrderListKey,Set<ActualSupplierData>> call() throws InterruptedException {
 
-        Map<String,Set<ActualSupplierData>> sigmaOnlyProcessedData = new LinkedHashMap<>();
+        Map<OrderListKey,Set<ActualSupplierData>> sigmaOnlyProcessedData = new LinkedHashMap<>();
         WebDriverManager.chromedriver().setup();;
         WebDriver driver = new ChromeDriver();
         driver.get("https://www.sigconnect.co.uk/login");
@@ -65,7 +66,7 @@ public class SigmaProcessService implements Callable<Map<String, Set<ActualSuppl
 
         int totalNoOfRecords = cascadeDataForSigma.size();
 
-        for (Map.Entry<String, Set<String>> entry : cascadeDataForSigma.entrySet()) {
+        for (Map.Entry<OrderListKey, Set<String>> entry : cascadeDataForSigma.entrySet()) {
             System.out.println("!!!!!Sigma!!!!! still total no of records "+ totalNoOfRecords-- +":");
             Set<String> existingData  = entry.getValue();
 

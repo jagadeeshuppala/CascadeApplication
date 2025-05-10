@@ -2,10 +2,7 @@ package com.pharmacy.bridgwater.CascadeApp.service;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
-import com.pharmacy.bridgwater.CascadeApp.model.BestwayData;
-import com.pharmacy.bridgwater.CascadeApp.model.CascadeSupplier;
-import com.pharmacy.bridgwater.CascadeApp.model.TridentData;
+import com.pharmacy.bridgwater.CascadeApp.model.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -15,6 +12,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
@@ -22,27 +20,27 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class BestwayProcessService implements Callable<Map<String, Set<ActualSupplierData>>> {
-    Map<String,Set<ActualSupplierData>> cascadeDataForBestway;
-    public BestwayProcessService(Map<String,Set<ActualSupplierData>> cascadeDataForBestway){
+public class BestwayProcessService implements Callable<Map<OrderListKey, Set<ActualSupplierData>>> {
+    Map<OrderListKey,Set<ActualSupplierData>> cascadeDataForBestway;
+    public BestwayProcessService(Map<OrderListKey,Set<ActualSupplierData>> cascadeDataForBestway){
         this.cascadeDataForBestway = cascadeDataForBestway;
     }
 
-    public static void main(String args[]) throws InterruptedException, JsonProcessingException {
+    public static void main(String args[]) throws InterruptedException, IOException {
         Long startTime = System.currentTimeMillis();
 
-        CascadeService cascade = new CascadeService();
-        Map<String, Set<ActualSupplierData>> cascadeResultsMap = cascade.getCascadeResults();
+        CascadeServiceFromOrderList cascade = new CascadeServiceFromOrderList();
+        Map<OrderListKey, Set<ActualSupplierData>> cascadeResultsMap = cascade.getCascadeResult();
 
 
 
-        Map<String,Set<ActualSupplierData>> cascadeDataForBestway = new LinkedHashMap<>();
-        for (Map.Entry<String, Set<ActualSupplierData>> entry : cascadeResultsMap.entrySet()) {
-            String key = entry.getKey();
+        Map<OrderListKey,Set<ActualSupplierData>> cascadeDataForBestway = new LinkedHashMap<>();
+        for (Map.Entry<OrderListKey, Set<ActualSupplierData>> entry : cascadeResultsMap.entrySet()) {
+            OrderListKey key = entry.getKey();
             Set<ActualSupplierData> bestwayCascadeSet = entry.getValue().stream().filter(cs ->"Bestway MedHub".equalsIgnoreCase(cs.getSupplier())
                             && !StringUtils.isEmpty(cs.getCode())
                     )
-                    .map(v -> ActualSupplierData.builder().description(key).cascadePrice(v.getCascadePrice()).cascadeStatus(v.getCascadeStatus()).code(v.getCode()).build())
+                    .map(v -> ActualSupplierData.builder().description(key.getOrderListDesc()).cascadePrice(v.getCascadePrice()).cascadeStatus(v.getCascadeStatus()).code(v.getCode()).build())
                     .collect(Collectors.toSet());
             cascadeDataForBestway.put(key, bestwayCascadeSet);
         }
@@ -64,7 +62,7 @@ public class BestwayProcessService implements Callable<Map<String, Set<ActualSup
                 new HashSet<>(Arrays.asList(ActualSupplierData.builder().code("7365323").cascadePrice(Double.valueOf("4.40")).cascadeStatus("Available").build()
                 )
                 ));*/
-        Map<String, Set<ActualSupplierData>> call = process.call();
+        Map<OrderListKey, Set<ActualSupplierData>> call = process.call();
         System.out.println(call);
         Long endTime = System.currentTimeMillis();
         System.out.println("Total time taken for the whole process is "+ (endTime-startTime)/1000 +" seconds");
@@ -73,7 +71,7 @@ public class BestwayProcessService implements Callable<Map<String, Set<ActualSup
 
 
     @Override
-    public Map<String,Set<ActualSupplierData>> call() throws InterruptedException {
+    public Map<OrderListKey,Set<ActualSupplierData>> call() throws InterruptedException {
         WebDriverManager.chromedriver().setup();;
         WebDriver driver = new ChromeDriver();
         driver.get("https://portal.bestwaymedhub.co.uk/en-GB/Account/Login");
@@ -92,8 +90,8 @@ public class BestwayProcessService implements Callable<Map<String, Set<ActualSup
 
 
         int totalNoOfRecords = cascadeDataForBestway.size();
-        for(Map.Entry<String,Set<ActualSupplierData>> entry: cascadeDataForBestway.entrySet()){
-            String description = entry.getKey();
+        for(Map.Entry<OrderListKey,Set<ActualSupplierData>> entry: cascadeDataForBestway.entrySet()){
+            OrderListKey description = entry.getKey();
             Set<ActualSupplierData> bestwayDataSet = entry.getValue();
 
             for(ActualSupplierData bestwayData : bestwayDataSet){

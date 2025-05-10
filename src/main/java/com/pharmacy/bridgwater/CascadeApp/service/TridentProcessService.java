@@ -4,6 +4,7 @@ package com.pharmacy.bridgwater.CascadeApp.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
 import com.pharmacy.bridgwater.CascadeApp.model.CascadeSupplier;
+import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
 import com.pharmacy.bridgwater.CascadeApp.model.TridentData;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.StringUtils;
@@ -19,15 +20,15 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 
-public class TridentProcessService implements Callable<Map<String, Set<ActualSupplierData>>> {
-    private Map<String,Set<ActualSupplierData>> cascadeDataForTrident;
-    public TridentProcessService(Map<String,Set<ActualSupplierData>> cascadeDataForTrident){
+public class TridentProcessService implements Callable<Map<OrderListKey, Set<ActualSupplierData>>> {
+    private Map<OrderListKey,Set<ActualSupplierData>> cascadeDataForTrident;
+    public TridentProcessService(Map<OrderListKey,Set<ActualSupplierData>> cascadeDataForTrident){
         this.cascadeDataForTrident = cascadeDataForTrident;
     }
 
     public static void main(String args[]) throws InterruptedException, JsonProcessingException {
         Long startTime = System.currentTimeMillis();
-        Map<String,Set<ActualSupplierData>> cascadeDataForTrident = new LinkedHashMap<>();
+        Map<OrderListKey,Set<ActualSupplierData>> cascadeDataForTrident = new LinkedHashMap<>();
 
 
        /* CascadeService cascade = new CascadeService();
@@ -45,7 +46,7 @@ public class TridentProcessService implements Callable<Map<String, Set<ActualSup
         TridentProcessService process = new TridentProcessService(cascadeResultsMap);
         Map<String, Set<ActualSupplierData>> p = process.call();*/
 
-        cascadeDataForTrident.put("BD Micro-Fine Ultra hypodermic insulin needles for pre-filled / reusable pen injectors screw on 4mm/32gauge Pk: 100",
+        cascadeDataForTrident.put(OrderListKey.builder().orderListDesc("BD Micro-Fine Ultra hypodermic insulin needles for pre-filled / reusable pen injectors screw on 4mm/32gauge Pk: 100").build(),
                 new HashSet<>(Arrays.asList(ActualSupplierData.builder().code("1027010").cascadePrice(Double.valueOf("4.36")).cascadeStatus("Available").build(),
                         ActualSupplierData.builder().code("6018477").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
                         ActualSupplierData.builder().code("8282410").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
@@ -71,7 +72,7 @@ public class TridentProcessService implements Callable<Map<String, Set<ActualSup
                 )
                 ));*/
         TridentProcessService process = new TridentProcessService(cascadeDataForTrident);
-        Map<String,Set<ActualSupplierData>> processedTridentData = process.call();
+        Map<OrderListKey,Set<ActualSupplierData>> processedTridentData = process.call();
         System.out.println(processedTridentData);
         Long endTime = System.currentTimeMillis();
         System.out.println("Total time taken for the whole process is "+ (endTime-startTime)/1000 +" seconds");
@@ -79,7 +80,7 @@ public class TridentProcessService implements Callable<Map<String, Set<ActualSup
 
 
     @Override
-    public Map<String,Set<ActualSupplierData>> call() throws InterruptedException {
+    public Map<OrderListKey,Set<ActualSupplierData>> call() throws InterruptedException {
 
         if(cascadeDataForTrident.isEmpty()){
             System.out.println("!!!!!Trident!!!!! There data is coming as empty from order pad, so nothing to check");
@@ -105,9 +106,9 @@ public class TridentProcessService implements Callable<Map<String, Set<ActualSup
 
 
         int totalNoOfRecords = cascadeDataForTrident.size();
-        for(Map.Entry<String,Set<ActualSupplierData>> entry: cascadeDataForTrident.entrySet()){
+        for(Map.Entry<OrderListKey,Set<ActualSupplierData>> entry: cascadeDataForTrident.entrySet()){
             System.out.println("!!!!!Trident!!!!! still total no of records "+ totalNoOfRecords-- +":");
-            String description = entry.getKey();
+            OrderListKey description = entry.getKey();
             Set<ActualSupplierData> tridentDataSet = entry.getValue();
 
             for(ActualSupplierData tridentData : tridentDataSet){

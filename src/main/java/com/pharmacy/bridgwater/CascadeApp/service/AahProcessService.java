@@ -4,6 +4,7 @@ package com.pharmacy.bridgwater.CascadeApp.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pharmacy.bridgwater.CascadeApp.constants.Constants;
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
+import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -18,9 +19,9 @@ import java.util.concurrent.Callable;
 
 
 
-public class AahProcessService implements Callable<Map<String, Set<ActualSupplierData>>> {
-    Map<String,Set<ActualSupplierData>> cascadeDataForAah;
-    public AahProcessService(Map<String,Set<ActualSupplierData>> cascadeDataForAah){
+public class AahProcessService implements Callable<Map<OrderListKey, Set<ActualSupplierData>>> {
+    Map<OrderListKey,Set<ActualSupplierData>> cascadeDataForAah;
+    public AahProcessService(Map<OrderListKey,Set<ActualSupplierData>> cascadeDataForAah){
         this.cascadeDataForAah = cascadeDataForAah;
     }
 
@@ -33,8 +34,8 @@ public class AahProcessService implements Callable<Map<String, Set<ActualSupplie
 
         AahProcessService process = new AahProcessService(cascadeResultsMap);
         Map<String, Set<ActualSupplierData>> aahOnlyResults = process.call();*/
-        Map<String,Set<ActualSupplierData>> cascadeDataForAah = new HashMap<>();
-        cascadeDataForAah.put("BD Micro-Fine Ultra hypodermic insulin needles for pre-filled / reusable pen injectors screw on 4mm/32gauge Pk: 100",
+        Map<OrderListKey,Set<ActualSupplierData>> cascadeDataForAah = new HashMap<>();
+        cascadeDataForAah.put(OrderListKey.builder().orderListDesc("BD Micro-Fine Ultra hypodermic insulin needles for pre-filled / reusable pen injectors screw on 4mm/32gauge Pk: 100").build() ,
                 new HashSet<>(Arrays.asList(
 
                         /*ActualSupplierData.builder().code("1195825").cascadePrice(Double.valueOf("4.36")).cascadeStatus("Available").build(),
@@ -66,7 +67,7 @@ public class AahProcessService implements Callable<Map<String, Set<ActualSupplie
                 )
                 ));
         AahProcessService process = new AahProcessService(cascadeDataForAah);
-        Map<String,Set<ActualSupplierData>> processedAahData = process.call();
+        Map<OrderListKey,Set<ActualSupplierData>> processedAahData = process.call();
         System.out.println(processedAahData);
 
 
@@ -93,7 +94,7 @@ public class AahProcessService implements Callable<Map<String, Set<ActualSupplie
 
 
     @Override
-    public Map<String,Set<ActualSupplierData>> call() throws InterruptedException {
+    public Map<OrderListKey,Set<ActualSupplierData>> call() throws InterruptedException {
         if(cascadeDataForAah.isEmpty()){
             System.out.println("!!!!!AAH!!!!! There data is coming as empty from order pad, so nothing to check");
             return cascadeDataForAah;
@@ -124,60 +125,65 @@ public class AahProcessService implements Callable<Map<String, Set<ActualSupplie
         }
         int totalNoOfRecords = cascadeDataForAah.size();
 
-        for(Map.Entry<String,Set<ActualSupplierData>> entry: cascadeDataForAah.entrySet()){
+        for(Map.Entry<OrderListKey,Set<ActualSupplierData>> entry: cascadeDataForAah.entrySet()){
             System.out.println("!!!!!AAH!!!!! still total no of records "+ totalNoOfRecords-- +":");
-            String description = entry.getKey();
+            OrderListKey description = entry.getKey();
             //Set<ActualSupplierData> aahDataSet = entry.getValue().stream().filter(Constants.SUPPLIER_AAH.equals(""));
             Set<ActualSupplierData> aahDataSet = entry.getValue();
 
             for(ActualSupplierData aahData : aahDataSet){
-                System.out.println("!!!!!AAH!!!!! Searching for pip code "+aahData.getCode()+":");
-                Thread.sleep(1000);
-                String pipCode = aahData.getCode();
-                // search box
-                driver.findElement(By.xpath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[1]/lightning-input[1]/lightning-primitive-input-simple[1]/div[1]/div[1]/input[1]")).clear();
-                driver.findElement(By.xpath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[1]/lightning-input[1]/lightning-primitive-input-simple[1]/div[1]/div[1]/input[1]")).sendKeys(pipCode);
-                Thread.sleep(1000);
-                // retrieved product list click
-                boolean success = false;
-                int retryCount = 0;
-                while(retryCount<3 && !success) {
-                    try {
-                        retryCount++;
-                        driver.findElement(By.xpath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[1]/div[2]/div[2]/ul[1]/li[1]")).click();
-                        Thread.sleep(3000);
-
-
-                        String descriptionFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/h4[1]")).getText();
-                        String priceFromWebsite = null;
-
+                try{
+                    System.out.println("!!!!!AAH!!!!! Searching for pip code "+aahData.getCode()+":");
+                    Thread.sleep(1000);
+                    String pipCode = aahData.getCode();
+                    // search box
+                    driver.findElement(By.xpath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[1]/lightning-input[1]/lightning-primitive-input-simple[1]/div[1]/div[1]/input[1]")).clear();
+                    driver.findElement(By.xpath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[1]/lightning-input[1]/lightning-primitive-input-simple[1]/div[1]/div[1]/input[1]")).sendKeys(pipCode);
+                    Thread.sleep(1000);
+                    // retrieved product list click
+                    boolean success = false;
+                    int retryCount = 0;
+                    while(retryCount<3 && !success) {
                         try {
-                            priceFromWebsite = driver.findElement(By.xpath("//html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[4]/div[1]/div[1]/div[1]/span[1]")).getText();
-                        } catch (Exception e) {
-                            System.out.println("priceFromWebsite is failing "+pipCode);
+                            retryCount++;
+                            driver.findElement(By.xpath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[1]/div[2]/div[2]/ul[1]/li[1]")).click();
+                            Thread.sleep(3000);
+
+
+                            String descriptionFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/h4[1]")).getText();
+                            String priceFromWebsite = null;
+
                             try {
-                                priceFromWebsite = driver.findElement(By.xpath("//html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[5]/div[1]/div[1]/div[1]/span[1]")).getText();
-                            } catch (Exception exception) {
-                                System.out.println("priceFromWebsite is failing again "+pipCode);
+                                priceFromWebsite = driver.findElement(By.xpath("//html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[4]/div[1]/div[1]/div[1]/span[1]")).getText();
+                            } catch (Exception e) {
+                                System.out.println("priceFromWebsite is failing "+pipCode);
+                                try {
+                                    priceFromWebsite = driver.findElement(By.xpath("//html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[5]/div[1]/div[1]/div[1]/span[1]")).getText();
+                                } catch (Exception exception) {
+                                    System.out.println("priceFromWebsite is failing again "+pipCode);
+                                }
                             }
+
+                            //String availablity = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[2]/span[1]/div[1]/div[2]")).getText();
+                            String availablityFromWebsite = driver.findElement(By.xpath("//div[@class='avail-col-text avail-col-width']")).getText();
+                            System.out.println("!!!!AAH !!! PipCode:" + pipCode + "; descFromWebsite:" + descriptionFromWebsite + "; priceFromWebsite:" + priceFromWebsite + "; availability:" + availablityFromWebsite);
+                            aahData.setCascadePrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
+                            //aahData.setCascadePrice(0.1);
+                            aahData.setCascadeStatus(!StringUtils.isEmpty(availablityFromWebsite) ? stockAvailability(availablityFromWebsite) : null);
+                            aahData.setSupplier("AAH Pharmaceuticals");
+                            success = true;
+
+
+                        } catch (Exception e) {
+                            success = false;
+                            System.out.println("!!!!AAH !!! Zero products might have resulted back for "+ pipCode+" so trying again " + retryCount);
                         }
-
-                        //String availablity = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[2]/span[1]/div[1]/div[2]")).getText();
-                        String availablityFromWebsite = driver.findElement(By.xpath("//div[@class='avail-col-text avail-col-width']")).getText();
-                        System.out.println("!!!!AAH !!! PipCode:" + pipCode + "; descFromWebsite:" + descriptionFromWebsite + "; priceFromWebsite:" + priceFromWebsite + "; availability:" + availablityFromWebsite);
-                        aahData.setCascadePrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
-                        //aahData.setCascadePrice(0.1);
-                        aahData.setCascadeStatus(!StringUtils.isEmpty(availablityFromWebsite) ? stockAvailability(availablityFromWebsite) : null);
-                        aahData.setSupplier("AAH Pharmaceuticals");
-                        success = true;
-
-
-                    } catch (Exception e) {
-                        success = false;
-                        System.out.println("!!!!AAH !!! Zero products might have resulted back for "+ pipCode+" so trying again " + retryCount);
                     }
+                    Thread.sleep(1000);
+
+                }catch (Exception e){
+                    System.out.println("There is a big exception in getting the pip "+ aahData.getCode());
                 }
-                Thread.sleep(1000);
 
 
             }
