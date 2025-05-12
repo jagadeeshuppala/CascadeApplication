@@ -41,9 +41,10 @@ public class CascadeResultsWithSigmaApp {
         public static final int TRIDENT_CASCADE_PRICE_CELL=50;public static final int TRIDENT_CASCADE_STATUS_CELL=51; public static final int TRIDENT_CASCADE_PIP_CELL=52;
 
 
-        //public static final String ORIGINAL_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList Copy.xlsx";
-        public static final String ORIGINAL_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy.xlsx";
-        public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy_copy.xlsx";
+        public static final String ORIGINAL_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList.xlsx";
+        //public static final String ORIGINAL_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy.xlsx";
+        public static final String COPIED_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList_Copy_copy.xlsx";
+        //public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy_copy.xlsx";
 
         public static final String CASCADE_UPLOAD_FILE_NAME = "upload.csv";
         public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
