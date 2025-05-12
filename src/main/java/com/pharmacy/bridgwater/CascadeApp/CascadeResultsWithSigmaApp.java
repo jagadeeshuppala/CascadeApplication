@@ -33,7 +33,7 @@ public class CascadeResultsWithSigmaApp {
         public static final int BESTWAY_PRICE_CELL=8;public static final int BESTWAY_PIP_CELL=34;public static final int BNS_PRICE_CELL=9;public static final int BNS_PIP_CELL=35;
         public static final int LEXON_PRICE_CELL=10;public static final int LEXON_PIP_CELL=36;public static final int OTC_PRICE_CELL=11;public static final int OTC_PIP_CELL=37;
         public static final int SIGMA_PRICE_CELL = 12; public static final int SIGMA_PIP_CELL=38;
-        public static final int TRIDENT_PRICE_CELL=13;public static final int TRIDENT_PIP_CELL=39;public static final int ALLIANCE_PRICE_CELL=14;
+        public static final int TRIDENT_PRICE_CELL=13;public static final int TRIDENT_PIP_CELL=39;/*public static final int ALLIANCE_PRICE_CELL=14;*/
         public static final int ALLIANCE_PIP_CELL=40;public static final int LOOKED_UP_AT=53;
         public static final int AAH_CASCADE_PRICE_CELL=41; public static final int AAH_CASCADE_STATUS_CELL=42; public static final int AAH_CASCADE_PIP_CELL=53;
         public static final int BESTWAY_CASCADE_PRICE_CELL=44;public static final int BESTWAY_CASCADE_STATUS_CELL = 45 ;public static final int BESTWAY_CASCADE_PIP_CELL=46;
@@ -73,6 +73,8 @@ public class CascadeResultsWithSigmaApp {
                 CellStyle normalFontStyle = workbook.createCellStyle();
                 Font normalFont=workbook.createFont();
                 normalFont.setColor(IndexedColors.BLACK.getIndex());
+                normalFont.setFontHeightInPoints((short) 10);
+                normalFont.setFontName("Arial");
                 normalFontStyle.setFont(normalFont);
 
                 //accounting font
@@ -80,6 +82,8 @@ public class CascadeResultsWithSigmaApp {
                 //accountingFontStyle.setDataFormat((short)8);
                 //accountingFontStyle.setDataFormat("##.##_");
                 Font accountingFont = workbook.createFont();
+                accountingFont.setFontHeightInPoints((short) 10);
+                accountingFont.setFontName("Arial");
                 accountingFont.setColor(IndexedColors.BLACK.getIndex());
                 accountingFontStyle.setFont(accountingFont);
 
@@ -87,12 +91,16 @@ public class CascadeResultsWithSigmaApp {
                 // redFont
                 CellStyle redFontStyle = workbook.createCellStyle();
                 Font redFont=workbook.createFont();
+                redFont.setFontHeightInPoints((short) 10);
+                redFont.setFontName("Arial");
                 redFont.setColor(IndexedColors.RED.getIndex());
                 redFontStyle.setFont(redFont);
 
                 //Green font
                 CellStyle greenFontStyle = workbook.createCellStyle();
                 Font greenFont=workbook.createFont();
+                greenFont.setFontHeightInPoints((short) 10);
+                greenFont.setFontName("Arial");
                 greenFont.setColor(IndexedColors.GREEN.getIndex());
                 greenFontStyle.setFont(greenFont);
 
@@ -402,7 +410,7 @@ public class CascadeResultsWithSigmaApp {
 
                                 }
                         }else{
-                                cell9.setCellValue("NS");
+                                //cell9.setCellValue("NS");
                         }
 
                         //AAH pip
@@ -438,7 +446,7 @@ public class CascadeResultsWithSigmaApp {
 
                                 }
                         }else{
-                                cell11.setCellValue("NS");
+                                //cell11.setCellValue("NS");
                         }
 
                         //Bestway pip
@@ -474,7 +482,7 @@ public class CascadeResultsWithSigmaApp {
 
                                 }
                         }else{
-                                cell13.setCellValue("NS");
+                                //cell13.setCellValue("NS");
                         }
 
                         //BNS pip
@@ -484,7 +492,7 @@ public class CascadeResultsWithSigmaApp {
                                 //get the cheaper BNS's pip
                                 cell14.setCellValue(cheaperBnsData.getCode());
                         }else{
-                                cell14.setCellValue("NA");
+                                //cell14.setCellValue("NA");
                         }
 
                         //Lexon
@@ -510,7 +518,7 @@ public class CascadeResultsWithSigmaApp {
 
                                 }
                         }else{
-                                cell15.setCellValue("NS");
+                                //cell15.setCellValue("NS");
                         }
 
                         //Lexon pip
@@ -556,7 +564,7 @@ public class CascadeResultsWithSigmaApp {
 
                                 }
                         }else{
-                                cell19.setCellValue("NS");
+                                //cell19.setCellValue("NS");
                         }
 
                         //Sigma pip
@@ -592,7 +600,7 @@ public class CascadeResultsWithSigmaApp {
 
                                 }
                         }else{
-                                cell21.setCellValue("NS");
+                                //cell21.setCellValue("NS");
                         }
 
                         //Trident pip
@@ -606,7 +614,7 @@ public class CascadeResultsWithSigmaApp {
                         }
 
                         //Alliance
-                        Cell cell23 = row.createCell(ALLIANCE_PRICE_CELL);
+                        /*Cell cell23 = row.createCell(ALLIANCE_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperAllianceData && null != cheaperPrice ){
                                 //if cheaper is Alliance, and available then yellow back with green -- greenBoldFontStyle
@@ -628,8 +636,8 @@ public class CascadeResultsWithSigmaApp {
 
                                 }
                         }else{
-                                cell23.setCellValue("NS");
-                        }
+                                //cell23.setCellValue("NS");
+                        }*/
 
                         //Alliance pip
                         Cell cell24 = row.createCell(ALLIANCE_PIP_CELL);
