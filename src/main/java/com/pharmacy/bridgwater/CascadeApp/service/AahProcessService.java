@@ -2,7 +2,6 @@ package com.pharmacy.bridgwater.CascadeApp.service;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.pharmacy.bridgwater.CascadeApp.constants.Constants;
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
 import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -59,7 +58,7 @@ public class AahProcessService implements Callable<Map<OrderListKey, Set<ActualS
                         ActualSupplierData.builder().code("1173525").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build()*/
 
 
-                        ActualSupplierData.builder().code("1099696").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build()
+                        ActualSupplierData.builder().code("1099696").price(Double.valueOf("4.64")).status("Available").build()
 
 
 
@@ -167,9 +166,9 @@ public class AahProcessService implements Callable<Map<OrderListKey, Set<ActualS
                             //String availablity = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[2]/span[1]/div[1]/div[2]")).getText();
                             String availablityFromWebsite = driver.findElement(By.xpath("//div[@class='avail-col-text avail-col-width']")).getText();
                             System.out.println("!!!!AAH !!! PipCode:" + pipCode + "; descFromWebsite:" + descriptionFromWebsite + "; priceFromWebsite:" + priceFromWebsite + "; availability:" + availablityFromWebsite);
-                            aahData.setCascadePrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
+                            aahData.setPrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
                             //aahData.setCascadePrice(0.1);
-                            aahData.setCascadeStatus(!StringUtils.isEmpty(availablityFromWebsite) ? stockAvailability(availablityFromWebsite) : null);
+                            aahData.setStatus(!StringUtils.isEmpty(availablityFromWebsite) ? stockAvailability(availablityFromWebsite) : null);
                             aahData.setSupplier("AAH Pharmaceuticals");
                             success = true;
 
@@ -200,7 +199,7 @@ public class AahProcessService implements Callable<Map<OrderListKey, Set<ActualS
             System.out.println("!!!!AAH !!! Failed to click on the logout");
         }
 
-        driver.close();;
+        driver.quit();;
 
         return cascadeDataForAah;
 

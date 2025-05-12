@@ -5,13 +5,12 @@ import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
 import com.pharmacy.bridgwater.CascadeApp.service.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,17 +26,24 @@ import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 
 public class CascadeResultsWithSigmaApp {
 
-        public static final int ORDER_LIST_DESC_CELL = 0; public static final int CASCADE_DESC_CELL = 7; public static final int QUANTITY_CELL = 4;
-        public static final int FROM_CELL=5; public static final int NOTES_CELL=6;public static final int TARRIF_CELL=8; public static final int TARIFF_AFTER_DEDUCTION_CELL=9;
-        public static final int CONCESSION_CELL=10; public static final int ORDER_LIST_PIP_CODE_CELL=11; public static final int AAH_PRICE_CELL=12;public static final int AAH_PIP_CELL=20;
-        public static final int BESTWAY_PRICE_CELL=13;public static final int BESTWAY_PIP_CELL=21;public static final int BNS_PRICE_CELL=14;public static final int BNS_PIP_CELL=22;
-        public static final int LEXON_PRICE_CELL=15;public static final int LEXON_PIP_CELL=23;public static final int OTC_PRICE_CELL=16;public static final int OTC_PIP_CELL=24;
-        public static final int SIGMA_PRICE_CELL = 17; public static final int SIGMA_PIP_CELL=25;
-        public static final int TRIDENT_PRICE_CELL=18;public static final int TRIDENT_PIP_CELL=26;public static final int ALLIANCE_PRICE_CELL=19;
-        public static final int ALLIANCE_PIP_CELL=27;public static final int LOOKED_UP_AT=28;
+        public static final int ORDER_LIST_DESC_CELL = 0; public static final int CASCADE_DESC_CELL = 28; public static final int QUANTITY_CELL = 4;
+        public static final int FROM_CELL=5; public static final int NOTES_CELL=6;public static final int TARRIF_CELL=29;
+        public static final int TARIFF_AFTER_DEDUCTION_CELL=30;
+        public static final int CONCESSION_CELL=31; public static final int ORDER_LIST_PIP_CODE_CELL=32; public static final int AAH_PRICE_CELL=7;public static final int AAH_PIP_CELL=33;
+        public static final int BESTWAY_PRICE_CELL=8;public static final int BESTWAY_PIP_CELL=34;public static final int BNS_PRICE_CELL=9;public static final int BNS_PIP_CELL=35;
+        public static final int LEXON_PRICE_CELL=10;public static final int LEXON_PIP_CELL=36;public static final int OTC_PRICE_CELL=11;public static final int OTC_PIP_CELL=37;
+        public static final int SIGMA_PRICE_CELL = 12; public static final int SIGMA_PIP_CELL=38;
+        public static final int TRIDENT_PRICE_CELL=13;public static final int TRIDENT_PIP_CELL=39;public static final int ALLIANCE_PRICE_CELL=14;
+        public static final int ALLIANCE_PIP_CELL=40;public static final int LOOKED_UP_AT=53;
+        public static final int AAH_CASCADE_PRICE_CELL=41; public static final int AAH_CASCADE_STATUS_CELL=42; public static final int AAH_CASCADE_PIP_CELL=53;
+        public static final int BESTWAY_CASCADE_PRICE_CELL=44;public static final int BESTWAY_CASCADE_STATUS_CELL = 45 ;public static final int BESTWAY_CASCADE_PIP_CELL=46;
+        public static final int SIGMA_CASCADE_PRICE_CELL=47;public static final int SIGMA_CASCADE_STATUS_CELL=48; public static final int SIGMA_CASCADE_PIP_CELL=49;
+        public static final int TRIDENT_CASCADE_PRICE_CELL=50;public static final int TRIDENT_CASCADE_STATUS_CELL=51; public static final int TRIDENT_CASCADE_PIP_CELL=52;
 
-        public static final String ORIGINAL_FILE_NAME = "/Users/juppala/MyNewWorkspace/CascadeApplication/src/main/resources/Supp codes.xlsx";
-        public static final String COPIED_FILE_NAME = "/Users/juppala/MyNewWorkspace/CascadeApplication/src/main/resources/Supp codes_copy.xlsx";
+
+        //public static final String ORIGINAL_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList Copy.xlsx";
+        public static final String ORIGINAL_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy.xlsx";
+        public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy_copy.xlsx";
 
         public static final String CASCADE_UPLOAD_FILE_NAME = "upload.csv";
         public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
@@ -45,18 +51,20 @@ public class CascadeResultsWithSigmaApp {
 
         public static final int ORDER_LIST_DESC = 0;
         public static final int ORDER_LIST_PIP = 1;
-        public static final int ORDER_LIST_QTY = 4;
+        public static final int ORDER_LIST_QTY = 3;
+        public static final int ORDER_LIST_FROM = 4;
 
 
         public static void main(String[] args) throws Exception{
                 Long startTime = System.currentTimeMillis();
 
-               // File original = new File(ORIGINAL_FILE_NAME);
-               // File copied = new File(COPIED_FILE_NAME);
-                //FileUtils.copyFile(original, copied);
+                File original = new File(ORIGINAL_FILE_NAME);
+                File copied = new File(COPIED_FILE_NAME);
+                FileUtils.copyFile(original, copied);
 
                 //updating the file with the results
-                Workbook workbook = new XSSFWorkbook(ORIGINAL_FILE_NAME);
+                FileInputStream file = new FileInputStream(COPIED_FILE_NAME);
+                Workbook workbook = new XSSFWorkbook(file);
                 //XSSFSheet my_sheet = workbook.createSheet("Cascade Results"+LocalDateTime.now().getDayOfMonth()+"-"+ LocalDateTime.now().getMonth()+"-"+ LocalDateTime.now().getYear());
                 Sheet my_sheet = workbook.getSheetAt(0);
 
@@ -65,6 +73,15 @@ public class CascadeResultsWithSigmaApp {
                 Font normalFont=workbook.createFont();
                 normalFont.setColor(IndexedColors.BLACK.getIndex());
                 normalFontStyle.setFont(normalFont);
+
+                //accounting font
+                CellStyle accountingFontStyle = workbook.createCellStyle();
+                //accountingFontStyle.setDataFormat((short)8);
+                //accountingFontStyle.setDataFormat("##.##_");
+                Font accountingFont = workbook.createFont();
+                accountingFont.setColor(IndexedColors.BLACK.getIndex());
+                accountingFontStyle.setFont(accountingFont);
+
 
                 // redFont
                 CellStyle redFontStyle = workbook.createCellStyle();
@@ -82,6 +99,7 @@ public class CascadeResultsWithSigmaApp {
                 CellStyle greenBoldFontStyle = workbook.createCellStyle();
                 greenBoldFontStyle.setFillForegroundColor(IndexedColors.YELLOW1.getIndex());
                 greenBoldFontStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                greenBoldFontStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00 "));
                 Font greenBoldFont=workbook.createFont();
                 greenBoldFont.setBold(true);
                 greenBoldFont.setColor(IndexedColors.GREEN.getIndex());
@@ -103,7 +121,7 @@ public class CascadeResultsWithSigmaApp {
 
 
 
-                ExecutorService executor = Executors.newFixedThreadPool(3);
+                ExecutorService executor = Executors.newFixedThreadPool(4);
 
 
                 //Filter aahResults and pass it to Aah service to fetch the aah results
@@ -213,46 +231,46 @@ public class CascadeResultsWithSigmaApp {
 
                         ActualSupplierData cheaperAahData = value.stream()
                                 .filter(v-> SUPPLIER_AAH.equalsIgnoreCase(v.getSupplier()))
-                                .filter(v-> v.getCascadePrice()!=null)
-                                .min(Comparator.comparing(ActualSupplierData::getCascadePrice)
+                                .filter(v-> v.getPrice()!=null)
+                                .min(Comparator.comparing(ActualSupplierData::getPrice)
                                 )
                                 .orElse(null);
 
 
                         ActualSupplierData cheaperBestwayData = value.stream().filter(v-> SUPPLIER_BESTWAY.equalsIgnoreCase(v.getSupplier()))
-                                .filter(v-> v.getCascadePrice()!=null)
-                                .min(Comparator.comparing(ActualSupplierData::getCascadePrice)
+                                .filter(v-> v.getPrice()!=null)
+                                .min(Comparator.comparing(ActualSupplierData::getPrice)
                                 )
                                 .orElse(null);
 
                         ActualSupplierData cheaperBnsData = value.stream().filter(v-> SUPPLIER_BNS.equalsIgnoreCase(v.getSupplier()))
-                                .filter(v-> v.getCascadePrice()!=null)
-                                .min(Comparator.comparing(ActualSupplierData::getCascadePrice)
+                                .filter(v-> v.getPrice()!=null)
+                                .min(Comparator.comparing(ActualSupplierData::getPrice)
                                 )
                                 .orElse(null);
 
                         ActualSupplierData cheaperLexonData = value.stream().filter(v-> SUPPLIER_LEXON.equalsIgnoreCase(v.getSupplier()))
-                                .filter(v-> v.getCascadePrice()!=null)
-                                .min(Comparator.comparing(ActualSupplierData::getCascadePrice)
+                                .filter(v-> v.getPrice()!=null)
+                                .min(Comparator.comparing(ActualSupplierData::getPrice)
                                 )
                                 .orElse(null);
 
                         ActualSupplierData cheaperSigmaData = value.stream().filter(v-> SUPPLIER_SIGMA.equalsIgnoreCase(v.getSupplier()))
-                                .filter(v-> v.getCascadePrice()!=null)
-                                .min(Comparator.comparing(ActualSupplierData::getCascadePrice)
+                                .filter(v-> v.getPrice()!=null)
+                                .min(Comparator.comparing(ActualSupplierData::getPrice)
                                 )
                                 .orElse(null);
 
                         ActualSupplierData cheaperTridentData = value.stream()
-                                .filter(v-> v.getCascadePrice()!=null)
+                                .filter(v-> v.getPrice()!=null)
                                 .filter(v-> SUPPLIER_TRIDENT.equalsIgnoreCase(v.getSupplier()))
-                                .min(Comparator.comparing(ActualSupplierData::getCascadePrice)
+                                .min(Comparator.comparing(ActualSupplierData::getPrice)
                                 )
                                 .orElse(null);
 
                         ActualSupplierData cheaperAllianceData = value.stream().filter(v-> SUPPLIER_ALLIANCE.equalsIgnoreCase(v.getSupplier()))
-                                .filter(v-> v.getCascadePrice()!=null)
-                                .min(Comparator.comparing(ActualSupplierData::getCascadePrice)
+                                .filter(v-> v.getPrice()!=null)
+                                .min(Comparator.comparing(ActualSupplierData::getPrice)
                                 )
                                 .orElse(null);
 
@@ -281,8 +299,15 @@ public class CascadeResultsWithSigmaApp {
 
                         ActualSupplierData cheaperPrice = //Stream.of(cheaperAahData, cheaperBestwayData, cheaperBnsData, cheaperLexonData, cheaperSigmaData, cheaperTridentData, cheaperAllianceData)
                                 s.stream()
-                                .min(Comparator.comparing(ActualSupplierData::getCascadePrice))
+                                .min(Comparator.comparing(ActualSupplierData::getPrice))
                                 .stream().findAny().orElse(null);
+
+                        ActualSupplierData cascadeDataForProductDesc = //Stream.of(cheaperAahData, cheaperBestwayData, cheaperBnsData, cheaperLexonData, cheaperSigmaData, cheaperTridentData, cheaperAllianceData)
+                                s.stream()
+                                        .filter( v-> !SUPPLIER_SIGMA.equalsIgnoreCase(v.getSupplier()))
+                                        .findAny().orElse(null);
+
+
 
                         Row row = my_sheet.getRow(key.getSno());
 
@@ -294,8 +319,8 @@ public class CascadeResultsWithSigmaApp {
 
                         //Cascade Desc
                         Cell cell1 = row.createCell(CASCADE_DESC_CELL);
-                        if(cheaperPrice!=null && cheaperPrice.getTariff()!=null){
-                                cell1.setCellValue(cheaperPrice.getDescription());
+                        if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getTariff()!=null){
+                                cell1.setCellValue(cascadeDataForProductDesc.getDescription());
                         }else{
                                 cell1.setCellValue("");
                         }
@@ -322,8 +347,8 @@ public class CascadeResultsWithSigmaApp {
 
                         //Tariff
                         Cell cell5 = row.createCell(TARRIF_CELL);
-                        if(cheaperPrice!=null && cheaperPrice.getTariff()!=null){
-                                cell5.setCellValue(cheaperPrice.getTariff());
+                        if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getTariff()!=null){
+                                cell5.setCellValue(cascadeDataForProductDesc.getTariff());
                         }else{
                                 cell5.setCellValue("");
                         }
@@ -331,8 +356,8 @@ public class CascadeResultsWithSigmaApp {
 
                         //TariffAfterDeduction
                         Cell cell6 = row.createCell(TARIFF_AFTER_DEDUCTION_CELL);
-                        if(cheaperPrice!=null && cheaperPrice.getTariffAfterDeduction()!=null){
-                                cell6.setCellValue(cheaperPrice.getTariffAfterDeduction());
+                        if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getTariffAfterDeduction()!=null){
+                                cell6.setCellValue(cascadeDataForProductDesc.getTariffAfterDeduction());
                         }else{
                                 cell6.setCellValue("");
                         }
@@ -340,8 +365,8 @@ public class CascadeResultsWithSigmaApp {
 
                         //concession
                         Cell cell7 = row.createCell(CONCESSION_CELL);
-                        if(cheaperPrice!=null && cheaperPrice.getConcession()!=null){
-                                cell7.setCellValue(cheaperPrice.getConcession());
+                        if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getConcession()!=null){
+                                cell7.setCellValue(cascadeDataForProductDesc.getConcession());
                         }else {
                                 cell7.setCellValue("");
                         }
@@ -351,42 +376,29 @@ public class CascadeResultsWithSigmaApp {
                         cell8.setCellValue(key.getOrderListPipCode());
                         cell8.setCellStyle(normalFontStyle);
 
-                        /*//AAH price
-                        Cell cell9 = row.createCell(AAH_PRICE_CELL);
-                        //If both are null, ie. its not stocked
-                        if(null != cheaperAahData && null != cheaperPrice ){
-                                //if cheaper is aah, and available then yellow back with green -- greenBoldFontStyle
-                                //if aah stock available then green, if stock not available then red
-                                if(null != cheaperAahData.getCascadeStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperAahData.getCascadeStatus())
-                                        && null != cheaperAahData.getCascadePrice()
-                                        && null != cheaperPrice.getCascadePrice()
-                                        && cheaperPrice.getCascadePrice().compareTo(cheaperAahData.getCascadePrice()) == 0){
-                                        cell9.setCellValue(cheaperAahData.getCascadePrice());
-                                        cell9.setCellStyle(greenBoldFontStyle);
-                                }else{
-                                        if(null != cheaperAahData.getCascadeStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperAahData.getCascadeStatus())){
-                                                cell9.setCellValue(cheaperAahData.getCascadePrice());
-                                                cell9.setCellStyle(greenFontStyle);
-                                        }else{
-                                                cell9.setCellValue(cheaperAahData.getCascadePrice());
-                                                cell9.setCellStyle(redFontStyle);
-                                        }
-
-                                }
-                        }else{
-                                cell9.setCellValue("NS");
-                        }*/
 
                         //AAH price
                         Cell cell9 = row.createCell(AAH_PRICE_CELL);
+                        cell9.getCellStyle().setDataFormat(workbook.createDataFormat().getFormat("[$$-1]0.00"));
                         //If both are null, ie. its not stocked
                         if(null != cheaperAahData){
-                                if(null != cheaperAahData.getCascadeStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperAahData.getCascadeStatus())){
-                                        cell9.setCellValue(cheaperAahData.getCascadePrice());
-                                        cell9.setCellStyle(greenFontStyle);
+                                //if cheaper is aah, and available then yellow back with green -- greenBoldFontStyle
+                                //if aah stock available then green, if stock not available then red
+                                if(null != cheaperAahData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperAahData.getStatus())
+                                        && null != cheaperAahData.getPrice()
+                                        && null != cheaperPrice.getPrice()
+                                        && cheaperPrice.getPrice().compareTo(cheaperAahData.getPrice()) == 0){
+                                        cell9.setCellValue(cheaperAahData.getPrice());
+                                        cell9.setCellStyle(greenBoldFontStyle);
                                 }else{
-                                        cell9.setCellValue(cheaperAahData.getCascadePrice());
-                                        cell9.setCellStyle(redFontStyle);
+                                        if(null != cheaperAahData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperAahData.getStatus())){
+                                                cell9.setCellValue(cheaperAahData.getPrice());
+                                                cell9.setCellStyle(greenFontStyle);
+                                        }else{
+                                                cell9.setCellValue(cheaperAahData.getPrice());
+                                                cell9.setCellStyle(redFontStyle);
+                                        }
+
                                 }
                         }else{
                                 cell9.setCellValue("NS");
@@ -406,12 +418,23 @@ public class CascadeResultsWithSigmaApp {
                         Cell cell11 = row.createCell(BESTWAY_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBestwayData && null != cheaperPrice ){
-                                if(null != cheaperBestwayData.getCascadeStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBestwayData.getCascadeStatus())){
-                                        cell11.setCellValue(cheaperBestwayData.getCascadePrice());
-                                        cell11.setCellStyle(greenFontStyle);
+                                //if cheaper is bestway, and available then yellow back with green -- greenBoldFontStyle
+                                //if bestway stock available then green, if stock not available then red
+                                if(null != cheaperBestwayData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBestwayData.getStatus())
+                                        && null != cheaperBestwayData.getPrice()
+                                        && null != cheaperPrice.getPrice()
+                                        && cheaperPrice.getPrice().compareTo(cheaperBestwayData.getPrice()) == 0){
+                                        cell11.setCellValue(cheaperBestwayData.getPrice());
+                                        cell11.setCellStyle(greenBoldFontStyle);
                                 }else{
-                                        cell11.setCellValue(cheaperBestwayData.getCascadePrice());
-                                        cell11.setCellStyle(redFontStyle);
+                                        if(null != cheaperBestwayData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBestwayData.getStatus())){
+                                                cell11.setCellValue(cheaperBestwayData.getPrice());
+                                                cell11.setCellStyle(greenFontStyle);
+                                        }else{
+                                                cell11.setCellValue(cheaperBestwayData.getPrice());
+                                                cell11.setCellStyle(redFontStyle);
+                                        }
+
                                 }
                         }else{
                                 cell11.setCellValue("NS");
@@ -431,12 +454,23 @@ public class CascadeResultsWithSigmaApp {
                         Cell cell13 = row.createCell(BNS_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBnsData && null != cheaperPrice ){
-                                if(null != cheaperBnsData.getCascadeStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBnsData.getCascadeStatus())){
-                                        cell13.setCellValue(cheaperBnsData.getCascadePrice());
-                                        cell13.setCellStyle(greenFontStyle);
+                                //if cheaper is bns, and available then yellow back with green -- greenBoldFontStyle
+                                //if bns stock available then green, if stock not available then red
+                                if(null != cheaperBnsData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBnsData.getStatus())
+                                        && null != cheaperBnsData.getPrice()
+                                        && null != cheaperPrice.getPrice()
+                                        && cheaperPrice.getPrice().compareTo(cheaperBnsData.getPrice()) == 0){
+                                        cell13.setCellValue(cheaperBnsData.getPrice());
+                                        cell13.setCellStyle(greenBoldFontStyle);
                                 }else{
-                                        cell13.setCellValue(cheaperBnsData.getCascadePrice());
-                                        cell13.setCellStyle(redFontStyle);
+                                        if(null != cheaperBnsData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBnsData.getStatus())){
+                                                cell13.setCellValue(cheaperBnsData.getPrice());
+                                                cell13.setCellStyle(greenFontStyle);
+                                        }else{
+                                                cell13.setCellValue(cheaperBnsData.getPrice());
+                                                cell13.setCellStyle(redFontStyle);
+                                        }
+
                                 }
                         }else{
                                 cell13.setCellValue("NS");
@@ -456,12 +490,23 @@ public class CascadeResultsWithSigmaApp {
                         Cell cell15 = row.createCell(LEXON_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperLexonData && null != cheaperPrice ){
-                                if(null != cheaperLexonData.getCascadeStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperLexonData.getCascadeStatus())){
-                                        cell15.setCellValue(cheaperLexonData.getCascadePrice());
-                                        cell15.setCellStyle(greenFontStyle);
+                                //if cheaper is Lexon, and available then yellow back with green -- greenBoldFontStyle
+                                //if Lexon stock available then green, if stock not available then red
+                                if(null != cheaperLexonData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperLexonData.getStatus())
+                                        && null != cheaperLexonData.getPrice()
+                                        && null != cheaperPrice.getPrice()
+                                        && cheaperPrice.getPrice().compareTo(cheaperLexonData.getPrice()) == 0){
+                                        cell15.setCellValue(cheaperLexonData.getPrice());
+                                        cell15.setCellStyle(greenBoldFontStyle);
                                 }else{
-                                        cell15.setCellValue(cheaperLexonData.getCascadePrice());
-                                        cell15.setCellStyle(redFontStyle);
+                                        if(null != cheaperLexonData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperLexonData.getStatus())){
+                                                cell15.setCellValue(cheaperLexonData.getPrice());
+                                                cell15.setCellStyle(greenFontStyle);
+                                        }else{
+                                                cell15.setCellValue(cheaperLexonData.getPrice());
+                                                cell15.setCellStyle(redFontStyle);
+                                        }
+
                                 }
                         }else{
                                 cell15.setCellValue("NS");
@@ -491,14 +536,23 @@ public class CascadeResultsWithSigmaApp {
                         Cell cell19 = row.createCell(SIGMA_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperSigmaData && null != cheaperPrice ){
-                                //if cheaper is aah, and available then yellow back with green -- greenBoldFontStyle
-                                //if aah stock available then green, if stock not available then red
-                                if(null != cheaperSigmaData.getCascadeStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperSigmaData.getCascadeStatus())){
-                                        cell19.setCellValue(cheaperSigmaData.getCascadePrice());
-                                        cell19.setCellStyle(greenFontStyle);
+                                //if cheaper is Sigma, and available then yellow back with green -- greenBoldFontStyle
+                                //if Sigma stock available then green, if stock not available then red
+                                if(null != cheaperSigmaData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperSigmaData.getStatus())
+                                        && null != cheaperSigmaData.getPrice()
+                                        && null != cheaperPrice.getPrice()
+                                        && cheaperPrice.getPrice().compareTo(cheaperSigmaData.getPrice()) == 0){
+                                        cell19.setCellValue(cheaperSigmaData.getPrice());
+                                        cell19.setCellStyle(greenBoldFontStyle);
                                 }else{
-                                        cell19.setCellValue(cheaperSigmaData.getCascadePrice());
-                                        cell19.setCellStyle(redFontStyle);
+                                        if(null != cheaperSigmaData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperSigmaData.getStatus())){
+                                                cell19.setCellValue(cheaperSigmaData.getPrice());
+                                                cell19.setCellStyle(greenFontStyle);
+                                        }else{
+                                                cell19.setCellValue(cheaperSigmaData.getPrice());
+                                                cell19.setCellStyle(redFontStyle);
+                                        }
+
                                 }
                         }else{
                                 cell19.setCellValue("NS");
@@ -518,12 +572,23 @@ public class CascadeResultsWithSigmaApp {
                         Cell cell21 = row.createCell(TRIDENT_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperTridentData && null != cheaperPrice ){
-                                if(null != cheaperTridentData.getCascadeStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperTridentData.getCascadeStatus())){
-                                        cell21.setCellValue(cheaperTridentData.getCascadePrice());
-                                        cell21.setCellStyle(greenFontStyle);
+                                //if cheaper is Trident, and available then yellow back with green -- greenBoldFontStyle
+                                //if Trident stock available then green, if stock not available then red
+                                if(null != cheaperTridentData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperTridentData.getStatus())
+                                        && null != cheaperTridentData.getPrice()
+                                        && null != cheaperPrice.getPrice()
+                                        && cheaperPrice.getPrice().compareTo(cheaperTridentData.getPrice()) == 0){
+                                        cell21.setCellValue(cheaperTridentData.getPrice());
+                                        cell21.setCellStyle(greenBoldFontStyle);
                                 }else{
-                                        cell21.setCellValue(cheaperTridentData.getCascadePrice());
-                                        cell21.setCellStyle(redFontStyle);
+                                        if(null != cheaperTridentData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperTridentData.getStatus())){
+                                                cell21.setCellValue(cheaperTridentData.getPrice());
+                                                cell21.setCellStyle(greenFontStyle);
+                                        }else{
+                                                cell21.setCellValue(cheaperTridentData.getPrice());
+                                                cell21.setCellStyle(redFontStyle);
+                                        }
+
                                 }
                         }else{
                                 cell21.setCellValue("NS");
@@ -543,12 +608,23 @@ public class CascadeResultsWithSigmaApp {
                         Cell cell23 = row.createCell(ALLIANCE_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperAllianceData && null != cheaperPrice ){
-                                if(null != cheaperAllianceData.getCascadeStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperAllianceData.getCascadeStatus())){
-                                        cell23.setCellValue(cheaperAllianceData.getCascadePrice());
-                                        cell23.setCellStyle(greenFontStyle);
+                                //if cheaper is Alliance, and available then yellow back with green -- greenBoldFontStyle
+                                //if Alliance stock available then green, if stock not available then red
+                                if(null != cheaperAllianceData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperAllianceData.getStatus())
+                                        && null != cheaperAllianceData.getPrice()
+                                        && null != cheaperPrice.getPrice()
+                                        && cheaperPrice.getPrice().compareTo(cheaperAllianceData.getPrice()) == 0){
+                                        cell23.setCellValue(cheaperAllianceData.getPrice());
+                                        cell23.setCellStyle(greenBoldFontStyle);
                                 }else{
-                                        cell23.setCellValue(cheaperAllianceData.getCascadePrice());
-                                        cell23.setCellStyle(redFontStyle);
+                                        if(null != cheaperAllianceData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperAllianceData.getStatus())){
+                                                cell23.setCellValue(cheaperAllianceData.getPrice());
+                                                cell23.setCellStyle(greenFontStyle);
+                                        }else{
+                                                cell23.setCellValue(cheaperAllianceData.getPrice());
+                                                cell23.setCellStyle(redFontStyle);
+                                        }
+
                                 }
                         }else{
                                 cell23.setCellValue("NS");
@@ -564,6 +640,86 @@ public class CascadeResultsWithSigmaApp {
                                 cell24.setCellValue("NA");
                         }
 
+                      /*  public static final int AAH_CASCADE_PRICE_CELL=41; public static final int AAH_CASCADE_STATUS_CELL=42; public static final int AAH_CASCADE_PIP_CELL=53;
+        public static final int BESTWAY_CASCADE_PRICE_CELL=44;public static final int BESTWAY_CASCADE_STATUS_CELL = 45 ;public static final int BESTWAY_CASCADE_PIP_CELL=46;
+        public static final int SIGMA_CASCADE_PRICE_CELL=47;public static final int SIGMA_CASCADE_STATUS_CELL=48; public static final int SIGMA_CASCADE_PIP_CELL=49;
+        public static final int TRIDENT_CASCADE_PRICE_CELL=50;public static final int TRIDENT_CASCADE_STATUS_CELL=51; public static final int TRIDENT_CASCADE_PIP_CELL=52;
+        */
+
+                        //AAH Cascade price
+                        Cell cell26 = row.createCell(AAH_CASCADE_PRICE_CELL);
+                        if(null !=cheaperAahData && null != cheaperAahData.getCascadePrice()){
+                                cell26.setCellValue(cheaperAahData.getCascadePrice());
+                                cell26.setCellStyle(accountingFontStyle);
+                        }
+
+                        //AAH Cascade status
+                        Cell cell27 = row.createCell(AAH_CASCADE_STATUS_CELL);
+                        if(null !=cheaperAahData && null != cheaperAahData.getCascadeStatus()){
+                                cell27.setCellValue(cheaperAahData.getCascadeStatus());
+                        }
+
+                        //AAH Cascade PIP
+                        Cell cell28 = row.createCell(AAH_CASCADE_PIP_CELL);
+                        if(null !=cheaperAahData && null != cheaperAahData.getCascadeCode()){
+                                cell28.setCellValue(cheaperAahData.getCascadeCode());
+                        }
+
+                        //
+                        //Bestway Cascade price
+                        Cell cell29 = row.createCell(BESTWAY_CASCADE_PRICE_CELL);
+                        if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadePrice()){
+                                cell29.setCellValue(cheaperBestwayData.getCascadePrice());
+                        }
+
+                        //Bestway Cascade status
+                        Cell cell30 = row.createCell(BESTWAY_CASCADE_STATUS_CELL);
+                        if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadeStatus()){
+                                cell30.setCellValue(cheaperBestwayData.getCascadeStatus());
+                        }
+
+                        //Bestway Cascade PIP
+                        Cell cell31 = row.createCell(BESTWAY_CASCADE_PIP_CELL);
+                        if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadeCode()){
+                                cell31.setCellValue(cheaperBestwayData.getCascadeCode());
+                        }
+
+                        //Sigma Cascade price
+                        Cell cell32 = row.createCell(SIGMA_CASCADE_PRICE_CELL);
+                        if(null !=cheaperSigmaData && null != cheaperSigmaData.getCascadePrice()){
+                                cell32.setCellValue(cheaperSigmaData.getCascadePrice());
+                        }
+
+                        //Sigma Cascade status
+                        Cell cell33 = row.createCell(SIGMA_CASCADE_STATUS_CELL);
+                        if(null !=cheaperSigmaData && null != cheaperSigmaData.getCascadeStatus()){
+                                cell33.setCellValue(cheaperSigmaData.getCascadeStatus());
+                        }
+
+                        //Sigma Cascade PIP
+                        Cell cell34 = row.createCell(SIGMA_CASCADE_PIP_CELL);
+                        if(null !=cheaperSigmaData && null != cheaperSigmaData.getCascadeCode()){
+                                cell34.setCellValue(cheaperSigmaData.getCascadeCode());
+                        }
+
+                        //Trident Cascade price
+                        Cell cell35 = row.createCell(TRIDENT_CASCADE_PRICE_CELL);
+                        if(null !=cheaperTridentData && null != cheaperTridentData.getCascadePrice()){
+                                cell35.setCellValue(cheaperTridentData.getCascadePrice());
+                        }
+
+                        //Trident Cascade status
+                        Cell cell36 = row.createCell(TRIDENT_CASCADE_STATUS_CELL);
+                        if(null !=cheaperTridentData && null != cheaperTridentData.getCascadeStatus()){
+                                cell36.setCellValue(cheaperTridentData.getCascadeStatus());
+                        }
+
+                        //Trident Cascade PIP
+                        Cell cell37 = row.createCell(TRIDENT_CASCADE_PIP_CELL);
+                        if(null !=cheaperTridentData && null != cheaperTridentData.getCascadeCode()){
+                                cell37.setCellValue(cheaperTridentData.getCascadeCode());
+                        }
+
                         Cell cell25 = row.createCell(LOOKED_UP_AT);
                         LocalDateTime now = LocalDateTime.now();
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -575,7 +731,7 @@ public class CascadeResultsWithSigmaApp {
                 }
 
                 /* Write changes to the workbook */
-                FileOutputStream out = new FileOutputStream(ORIGINAL_FILE_NAME);
+                FileOutputStream out = new FileOutputStream(COPIED_FILE_NAME);
                 workbook.write(out);
                 out.close();
 

@@ -40,7 +40,7 @@ public class CascadeServiceFromOrderList {
 
 
 
-        FileInputStream file = new FileInputStream(ORIGINAL_FILE_NAME);
+        FileInputStream file = new FileInputStream(COPIED_FILE_NAME);
         Workbook workbook = new XSSFWorkbook(file);
         Sheet sheet = workbook.getSheetAt(0);
 
@@ -58,6 +58,7 @@ public class CascadeServiceFromOrderList {
                 if (sheet.getRow(i).getCell(ORDER_LIST_DESC) != null
                         && sheet.getRow(i).getCell(ORDER_LIST_PIP) != null
                         && sheet.getRow(i).getCell(ORDER_LIST_QTY)!=null
+                        && sheet.getRow(i).getCell(ORDER_LIST_FROM)!=null
 
                         && sheet.getRow(i).getCell(ORDER_LIST_DESC).getCellType() != CellType.BLANK
                         && !sheet.getRow(i).getCell(ORDER_LIST_DESC).toString().trim().equals("")
@@ -65,14 +66,23 @@ public class CascadeServiceFromOrderList {
                         && !sheet.getRow(i).getCell(ORDER_LIST_PIP).toString().trim().equals("")
                         && sheet.getRow(i).getCell(ORDER_LIST_QTY).getCellType() != CellType.BLANK
                         && !sheet.getRow(i).getCell(ORDER_LIST_QTY).toString().trim().equals("")
+                        &&(sheet.getRow(i).getCell(ORDER_LIST_FROM).getCellType()== CellType.BLANK || sheet.getRow(i).getCell(ORDER_LIST_FROM).toString().trim().equals(""))
 
                 ) {
+                    try{
 
-                    String content = Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_PIP))).intValue()+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY))).intValue() + "\r\n";
-                    String mappingFileContent = i+","+sheet.getRow(i).getCell(ORDER_LIST_DESC)+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_PIP))).intValue()+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY))).intValue() + "\r\n";
+                        String content = Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_PIP))).intValue()+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY))).intValue() + "\r\n";
+                        String mappingFileContent = i+","+sheet.getRow(i).getCell(ORDER_LIST_DESC)+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_PIP))).intValue()+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY))).intValue() + "\r\n";
 
-                    cascadeUploadFile.write(content);
-                    mappingFile.write(mappingFileContent);
+                        cascadeUploadFile.write(content);
+                        mappingFile.write(mappingFileContent);
+
+                    }catch (Exception e){
+                        System.out.println("value of i ="+i );
+                        System.out.println(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY)));
+                        System.out.println(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_FROM)));
+                        System.out.println();
+                    }
 
                 }
 
@@ -81,6 +91,7 @@ public class CascadeServiceFromOrderList {
 
 
         }catch (Exception e){
+            e.printStackTrace();
             System.out.println("Exception occured while writing to the cascade upload file and its mapping file");
         }finally {
             cascadeUploadFile.flush();
@@ -90,15 +101,7 @@ public class CascadeServiceFromOrderList {
             file.close();
         }
 
-        //iterating over th mapping to enrich the data
 
-        try (Stream<String> stream = Files.lines(Paths.get(CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO))) {
-            stream.forEach( v ->{
-                orderListSnoMapping.add(Integer.valueOf(v.split(",")[0]));
-                orderListDescMapping.add(v.split(",")[1]);
-                orderListPipCodesMapping.add(v.split(",")[2]);
-            });
-        }
 
 
         System.out.println();
@@ -158,15 +161,66 @@ public class CascadeServiceFromOrderList {
 
         //click on choose button
         driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[2]/input[1]"))
-                .sendKeys("/Users/juppala/MyNewWorkspace/CascadeApplication/"+CASCADE_UPLOAD_FILE_NAME);
+                .sendKeys("C:\\Users\\msola\\IdeaProjects\\CascadeApplication\\"+CASCADE_UPLOAD_FILE_NAME);
 
         //click on import button
         driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[3]/div[1]/div[2]/div[1]/div[3]/div[2]/button[1]"))
                 .click();
 
         Thread.sleep(10000);
-        //click on ok button after the import
-        driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[9]/div[1]/div[1]/div[2]/div[2]/button[1]")).click();
+        // if there are any exceptions in cascade uploaded file, need to remove from the mapping list
+        List<Integer> snoToBeDeleted = new LinkedList<>();
+        try{
+            List<WebElement> errorTableList = driver.findElements(By.xpath("/html/body/div[1]/div[2]/form/div[6]/div/div/div[2]/div/table/tr"));
+            System.out.println("size of error table :::"+errorTableList.size());
+            for(int i=1;i<=errorTableList.size();i++){
+                String snoString = driver.findElement(By.xpath("/html/body/div[1]/div[2]/form/div[6]/div/div/div[2]/div/table/tr["+i+"]/td[1]")).getText();
+                Integer sno = Integer.valueOf(snoString);
+                snoToBeDeleted.add(sno);
+            }
+
+            // delete from mapping list
+
+            File overridenMappingFile = new File(CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO);
+            List<String> lines = FileUtils.readLines(overridenMappingFile);
+            List<String> linesTobeDeleted = new LinkedList<>();
+
+            for(Integer sno : snoToBeDeleted){
+                String s = lines.get(sno - 1);
+                System.out.println("Removing "+s+" value from list as cascade said there is a problem with that product");
+                linesTobeDeleted.add(s);
+            }
+            lines.removeAll(linesTobeDeleted);
+
+            FileUtils.writeLines(overridenMappingFile, lines, false);
+
+
+            driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[6]/div[1]/div[1]/div[1]/button[1]")).click();
+
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("There are no errors, so we are ok");
+        }
+        try{
+            //click on ok button after the import
+            driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[9]/div[1]/div[1]/div[2]/div[2]/button[1]")).click();
+        }catch (Exception e){
+            System.out.println("!!!There is no ok button!!");
+        }
+
+        //iterating over the mapping to enrich the data
+
+        try (Stream<String> stream = Files.lines(Paths.get(CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO))) {
+            stream.forEach( v ->{
+                orderListSnoMapping.add(Integer.valueOf(v.split(",")[0]));
+                orderListDescMapping.add(v.split(",")[1]);
+                orderListPipCodesMapping.add(v.split(",")[2]);
+            });
+        }
+
+
 
         //cascade order pad click
         driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/header[1]/div[2]/nav[1]/div[2]/ul[1]/li[3]/a[1]")).click();
@@ -258,7 +312,8 @@ public class CascadeServiceFromOrderList {
 
                     if(!StringUtils.isEmpty(code)){
                         cascadeSupplierList.add(ActualSupplierData.builder()
-                                .supplier(supplier).cascadePrice(priceInDouble).code(code).cascadeStatus(availability)
+                                .supplier(supplier).price(priceInDouble).code(code).status(availability)
+                                        .cascadeCode(code).cascadeStatus(availability).cascadePrice(priceInDouble)
                                 .description(descriptionFromWebsite)
                                 .quantity(!StringUtils.isEmpty(quantityFromWebsite)?Integer.valueOf(quantityFromWebsite.trim()):null)
                                 .tariff(!StringUtils.isEmpty(tariffFromWebsite)?Double.valueOf(tariffFromWebsite.trim()):null)
@@ -288,7 +343,7 @@ public class CascadeServiceFromOrderList {
 
         System.out.println();
 
-        driver.close();
+        driver.quit();
 
 
 

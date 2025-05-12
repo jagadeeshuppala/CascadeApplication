@@ -2,8 +2,6 @@ package com.pharmacy.bridgwater.CascadeApp.model;
 
 import lombok.*;
 
-import java.util.Objects;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -13,9 +11,12 @@ import java.util.Objects;
 public class ActualSupplierData {
     private String supplier;
     private String description;
-    private Double cascadePrice;
-
+    private Double price;
     private String code;
+    private String status;
+
+    private Double cascadePrice;
+    private String cascadeCode;
     private String cascadeStatus;
 
 
@@ -23,7 +24,6 @@ public class ActualSupplierData {
     private Double tariff;
     private Double tariffAfterDeduction;
     private Double concession;
-
 
     private String orderListPip;
 

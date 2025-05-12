@@ -3,9 +3,7 @@ package com.pharmacy.bridgwater.CascadeApp.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
-import com.pharmacy.bridgwater.CascadeApp.model.CascadeSupplier;
 import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
-import com.pharmacy.bridgwater.CascadeApp.model.TridentData;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -17,7 +15,6 @@ import org.openqa.selenium.interactions.Actions;
 
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 
 public class TridentProcessService implements Callable<Map<OrderListKey, Set<ActualSupplierData>>> {
@@ -47,18 +44,18 @@ public class TridentProcessService implements Callable<Map<OrderListKey, Set<Act
         Map<String, Set<ActualSupplierData>> p = process.call();*/
 
         cascadeDataForTrident.put(OrderListKey.builder().orderListDesc("BD Micro-Fine Ultra hypodermic insulin needles for pre-filled / reusable pen injectors screw on 4mm/32gauge Pk: 100").build(),
-                new HashSet<>(Arrays.asList(ActualSupplierData.builder().code("1027010").cascadePrice(Double.valueOf("4.36")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("6018477").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("8282410").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("6180319").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("7942741").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("7377179").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("6996275").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("8092728").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("6996219").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("7033210").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("8199010").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build(),
-                        ActualSupplierData.builder().code("6013346").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build()
+                new HashSet<>(Arrays.asList(ActualSupplierData.builder().code("1027010").price(Double.valueOf("4.36")).status("Available").build(),
+                        ActualSupplierData.builder().code("6018477").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("8282410").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("6180319").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("7942741").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("7377179").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("6996275").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("8092728").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("6996219").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("7033210").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("8199010").price(Double.valueOf("4.64")).status("Available").build(),
+                        ActualSupplierData.builder().code("6013346").price(Double.valueOf("4.64")).status("Available").build()
                 )
                 ));
 
@@ -196,9 +193,9 @@ public class TridentProcessService implements Callable<Map<OrderListKey, Set<Act
                     }
 
                     System.out.println("!!!!Trident !!!PipCode:"+pipCode+"; descFromWebsite:"+descriptionFromWebsite+ "; priceFromWebsite:"+ priceFromWebsite+ "; availability:"+availablityFromWebsite);
-                    tridentData.setCascadePrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
+                    tridentData.setPrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
                     //tridentData.setCascadePrice(0.3);
-                    tridentData.setCascadeStatus(!StringUtils.isEmpty(availablityFromWebsite)?stockAvailability(availablityFromWebsite):null);
+                    tridentData.setStatus(!StringUtils.isEmpty(availablityFromWebsite)?stockAvailability(availablityFromWebsite):null);
 
 
                 }catch (Exception e){
@@ -221,7 +218,7 @@ public class TridentProcessService implements Callable<Map<OrderListKey, Set<Act
             e.printStackTrace();
             System.out.println("!!!!Trident !!! Falied to click on the logout");
         }
-        driver.close();
+        driver.quit();
 
         return cascadeDataForTrident;
 

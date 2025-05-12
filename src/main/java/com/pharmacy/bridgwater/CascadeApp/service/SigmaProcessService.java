@@ -1,10 +1,8 @@
 package com.pharmacy.bridgwater.CascadeApp.service;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
 import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
-import com.pharmacy.bridgwater.CascadeApp.model.SigmaData;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +11,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 
 public class SigmaProcessService implements Callable<Map<OrderListKey, Set<ActualSupplierData>>> {
@@ -90,11 +87,11 @@ public class SigmaProcessService implements Callable<Map<OrderListKey, Set<Actua
                         String availability = stockAvailability(stockClass);
                         System.out.println("!!!! Sigma !!!! description:"+description+"; pip:"+pip+"; availability:"+availability + "; price"+price);
                         ActualSupplierData s = ActualSupplierData.builder().description(description)
-                                .cascadePrice(!StringUtils.isEmpty(price)? Double.valueOf(price.replaceAll("£","")):null)
+                                .price(!StringUtils.isEmpty(price)? Double.valueOf(price.replaceAll("£","")):null)
                                 //.cascadePrice(0.2)
                                 .supplier("Sigma")
                                 //.definitePrice(!StringUtils.isEmpty(price)? Double.valueOf(price.replaceAll("£","")):null)
-                                .cascadeStatus(availability).code(pip)
+                                .status(availability).code(pip)
                                // .definiteStatus(availability)
                                 //.tariff(anyOfCascadeData.getTariff())
                                 //.tariffAfterDeduction(anyOfCascadeData.getTariffAfterDeduction())
@@ -116,7 +113,7 @@ public class SigmaProcessService implements Callable<Map<OrderListKey, Set<Actua
         }catch (Exception e){
             System.out.println("!!!Sigma!!! Failed to logoff");
         }
-        driver.close();
+        driver.quit();
         return sigmaOnlyProcessedData;
 
     }

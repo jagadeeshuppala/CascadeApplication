@@ -1,16 +1,13 @@
 package com.pharmacy.bridgwater.CascadeApp.service;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pharmacy.bridgwater.CascadeApp.model.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.interactions.Actions;
 
 import java.io.IOException;
 import java.util.*;
@@ -40,7 +37,7 @@ public class BestwayProcessService implements Callable<Map<OrderListKey, Set<Act
             Set<ActualSupplierData> bestwayCascadeSet = entry.getValue().stream().filter(cs ->"Bestway MedHub".equalsIgnoreCase(cs.getSupplier())
                             && !StringUtils.isEmpty(cs.getCode())
                     )
-                    .map(v -> ActualSupplierData.builder().description(key.getOrderListDesc()).cascadePrice(v.getCascadePrice()).cascadeStatus(v.getCascadeStatus()).code(v.getCode()).build())
+                    .map(v -> ActualSupplierData.builder().description(key.getOrderListDesc()).price(v.getPrice()).status(v.getStatus()).code(v.getCode()).build())
                     .collect(Collectors.toSet());
             cascadeDataForBestway.put(key, bestwayCascadeSet);
         }
@@ -140,9 +137,9 @@ public class BestwayProcessService implements Callable<Map<OrderListKey, Set<Act
 
                         System.out.println("!!!!Bestway !!! Description:"+descFromBestwayWebsite+"; price:"+priceFromBestwayWebsite+"; stock"+stockAvailability(stockFromBestwayWebsite)+ "; pipcode"+pipCodeFromBestwayWebsite);
                         if(!StringUtils.isEmpty(pipCodeFromBestwayWebsite) && pipCodeFromBestwayWebsite.equals(!StringUtils.isEmpty(bestwayData.getCode()) ? bestwayData.getCode() : "")){
-                            bestwayData.setCascadePrice(!StringUtils.isEmpty(priceFromBestwayWebsite) ? Double.valueOf(priceFromBestwayWebsite.replace("Price: ","").trim()):null);
+                            bestwayData.setPrice(!StringUtils.isEmpty(priceFromBestwayWebsite) ? Double.valueOf(priceFromBestwayWebsite.replace("Price: ","").trim()):null);
                             //bestwayData.setCascadePrice(Double.valueOf(-0.4));
-                            bestwayData.setCascadeStatus(stockAvailability(stockFromBestwayWebsite));
+                            bestwayData.setStatus(stockAvailability(stockFromBestwayWebsite));
                             System.out.println("!!!!Bestway !!! Found the match at:" +actualJvalue);
                             break;
                         }
@@ -182,7 +179,7 @@ public class BestwayProcessService implements Callable<Map<OrderListKey, Set<Act
             System.out.println("!!!!Bestway !!! Falied to click on the logout");
         }
 
-        driver.close();
+        driver.quit();
 
         return cascadeDataForBestway;
 

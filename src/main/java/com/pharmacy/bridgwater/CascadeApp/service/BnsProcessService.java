@@ -3,16 +3,11 @@ package com.pharmacy.bridgwater.CascadeApp.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
-import com.pharmacy.bridgwater.CascadeApp.model.BnsData;
-import com.pharmacy.bridgwater.CascadeApp.model.TridentData;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.interactions.Actions;
 
 import java.util.*;
 
@@ -37,7 +32,7 @@ public class BnsProcessService {
         }*/
 
         cascadeDataForTrident.put("BD Micro-Fine Ultra hypodermic insulin needles for pre-filled / reusable pen injectors screw on 4mm/32gauge Pk: 100",
-                new HashSet<>(Arrays.asList(ActualSupplierData.builder().code("7943103").cascadePrice(Double.valueOf("4.36")).cascadeStatus("Available").build()
+                new HashSet<>(Arrays.asList(ActualSupplierData.builder().code("7943103").price(Double.valueOf("4.36")).status("Available").build()
                         //,TridentData.builder().code("6177560").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build()
                 )
                 ));

@@ -6,12 +6,10 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.interactions.Actions;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 public class CascadeService {
@@ -134,7 +132,7 @@ public class CascadeService {
 
                     if(!StringUtils.isEmpty(code)){
                         cascadeSupplierList.add(ActualSupplierData.builder()
-                                .supplier(supplier).cascadePrice(priceInDouble).code(code).cascadeStatus(availability)
+                                .supplier(supplier).price(priceInDouble).code(code).status(availability)
                                 //.definitePrice(priceInDouble)
                                 //.definiteStatus(availability)
                                 .description(descriptionFromWebsite)
@@ -159,7 +157,7 @@ public class CascadeService {
         //logoff
         driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[1]/header[1]/div[1]/section[1]/form[1]/a[1]")).click();
 
-        driver.close();
+        driver.quit();
 
 
         System.out.println("==================================================================");
