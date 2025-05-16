@@ -118,7 +118,7 @@ public class SigmaProcessService implements Callable<Map<OrderListKey, Set<Actua
 
     }
 
-    private String stockAvailability(String stockAvailablityClass){
+    public static String stockAvailability(String stockAvailablityClass){
         switch (stockAvailablityClass){
             case "ng-binding no_stock":
                 return "Not Available";

@@ -40,11 +40,15 @@ public class CascadeResultsWithSigmaApp {
         public static final int SIGMA_CASCADE_PRICE_CELL=47;public static final int SIGMA_CASCADE_STATUS_CELL=48; public static final int SIGMA_CASCADE_PIP_CELL=49;
         public static final int TRIDENT_CASCADE_PRICE_CELL=50;public static final int TRIDENT_CASCADE_STATUS_CELL=51; public static final int TRIDENT_CASCADE_PIP_CELL=52;
 
+        //In Pharmacy
+        /*public static final String ORIGINAL_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList.xlsx";
+        public static final String WORK_TO_BE_DONE_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList.xlsx";
+        public static final String COPIED_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList_Copy_copy.xlsx";*/
 
-        public static final String ORIGINAL_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList.xlsx";
-        //public static final String ORIGINAL_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy.xlsx";
-        public static final String COPIED_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList_Copy_copy.xlsx";
-        //public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy_copy.xlsx";
+        //At Home
+        public static final String ORIGINAL_FILE_NAME = "/Users/juppala/MyNewWorkspace/CascadeApplication/src/main/resources/Supp codes.xlsx";
+        public static final String WORK_TO_BE_DONE_FILE_NAME = "/Users/juppala/MyNewWorkspace/CascadeApplication/src/main/resources/Supp codes.xlsx";
+        public static final String COPIED_FILE_NAME = "/Users/juppala/MyNewWorkspace/CascadeApplication/src/main/resources/Supp codes_copy.xlsx";
 
         public static final String CASCADE_UPLOAD_FILE_NAME = "upload.csv";
         public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
@@ -55,6 +59,10 @@ public class CascadeResultsWithSigmaApp {
         public static final int ORDER_LIST_QTY = 3;
         public static final int ORDER_LIST_FROM = 4;
 
+        public static final String SIGMA_ORDERING_TEXT_IN_NOTES = "s";
+
+        public static final String CASCADE_UPLOAD_FILE_BASE_LOCATION = "/Users/juppala/MyNewWorkspace/CascadeApplication/";
+
 
         public static void main(String[] args) throws Exception{
                 Long startTime = System.currentTimeMillis();
@@ -64,9 +72,8 @@ public class CascadeResultsWithSigmaApp {
                 FileUtils.copyFile(original, copied);
 
                 //updating the file with the results
-                FileInputStream file = new FileInputStream(COPIED_FILE_NAME);
+                FileInputStream file = new FileInputStream(WORK_TO_BE_DONE_FILE_NAME);
                 Workbook workbook = new XSSFWorkbook(file);
-                //XSSFSheet my_sheet = workbook.createSheet("Cascade Results"+LocalDateTime.now().getDayOfMonth()+"-"+ LocalDateTime.now().getMonth()+"-"+ LocalDateTime.now().getYear());
                 Sheet my_sheet = workbook.getSheetAt(0);
 
                 // normalFont
@@ -108,7 +115,7 @@ public class CascadeResultsWithSigmaApp {
                 CellStyle greenBoldFontStyle = workbook.createCellStyle();
                 greenBoldFontStyle.setFillForegroundColor(IndexedColors.YELLOW1.getIndex());
                 greenBoldFontStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-                greenBoldFontStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00 "));
+                //greenBoldFontStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00 "));
                 Font greenBoldFont=workbook.createFont();
                 greenBoldFont.setBold(true);
                 greenBoldFont.setColor(IndexedColors.GREEN.getIndex());
@@ -740,7 +747,7 @@ public class CascadeResultsWithSigmaApp {
                 }
 
                 /* Write changes to the workbook */
-                FileOutputStream out = new FileOutputStream(COPIED_FILE_NAME);
+                FileOutputStream out = new FileOutputStream(WORK_TO_BE_DONE_FILE_NAME);
                 workbook.write(out);
                 out.close();
 
