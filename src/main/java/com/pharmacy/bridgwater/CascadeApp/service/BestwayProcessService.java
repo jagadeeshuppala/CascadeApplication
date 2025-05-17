@@ -25,7 +25,7 @@ public class BestwayProcessService implements Callable<Map<OrderListKey, Set<Act
 
     public static void main(String args[]) throws InterruptedException, IOException {
         Long startTime = System.currentTimeMillis();
-
+/*
         CascadeServiceFromOrderList cascade = new CascadeServiceFromOrderList();
         Map<OrderListKey, Set<ActualSupplierData>> cascadeResultsMap = cascade.getCascadeResult();
 
@@ -40,17 +40,18 @@ public class BestwayProcessService implements Callable<Map<OrderListKey, Set<Act
                     .map(v -> ActualSupplierData.builder().description(key.getOrderListDesc()).price(v.getPrice()).status(v.getStatus()).code(v.getCode()).build())
                     .collect(Collectors.toSet());
             cascadeDataForBestway.put(key, bestwayCascadeSet);
-        }
+        }*/
 
+        Map<OrderListKey, Set<ActualSupplierData>> cascadeDataForBestway = new LinkedHashMap<>();
         BestwayProcessService process = new BestwayProcessService(cascadeDataForBestway);
 
-       /* cascadeDataForBestway.put("Levothyroxine sodium 100microgram tablets Pk: 28",
-                new HashSet<>(Arrays.asList(ActualSupplierData.builder().description("Levothyroxine sodium 100microgram tablets Pk: 28").code("1022144").cascadePrice(Double.valueOf("20.00")).cascadeStatus("Available").build()
-                        //,BestwayData.builder().code("6177560").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build()
+        cascadeDataForBestway.put(OrderListKey.builder().orderListDesc("FUROSEMIDE").orderListPipCode("1185802").build(),
+                new HashSet<>(Arrays.asList(ActualSupplierData.builder().description("FUROSEMIDE").code("1185802").cascadePrice(Double.valueOf("20.00")).cascadeStatus("Available").build()
+                      //  ,BestwayData.builder().code("6177560").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build()
                 )
                 ));
 
-        cascadeDataForBestway.put("Lisinopril 20mg tablets Pk: 28",
+        /*cascadeDataForBestway.put("Lisinopril 20mg tablets Pk: 28",
                 new HashSet<>(Arrays.asList(ActualSupplierData.builder().description("Lisinopril 20mg tablets Pk: 28").code("1103282").cascadePrice(Double.valueOf("20.00")).cascadeStatus("Available").build()
                 )
                 ));
@@ -124,16 +125,17 @@ public class BestwayProcessService implements Callable<Map<OrderListKey, Set<Act
 
                 int actualJvalue =1;
                 for(int j = 1; j<= numberOfProducts && actualJvalue <=numberOfProducts; j++){
-                    System.out.println("Acutal J value "+actualJvalue + " prodListElement size "+ numberOfProducts);
+                    System.out.println("Acutal J value "+actualJvalue + "; Current j Value "+j+" prodListElement size "+ numberOfProducts);
                     actualJvalue++;
 
                     try{
+                        //
                         String descFromBestwayWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[1]")).getText();
                         String priceFromBestwayWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[7]")).getText();
                         String pipCodeFromBestwayWebsiteWithCat = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[6]")).getText();
                         String stockFromBestwayWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/div["+(j)+"]/div[9]/img")).getAttribute("src");
 
-                        String pipCodeFromBestwayWebsite = !StringUtils.isEmpty(pipCodeFromBestwayWebsiteWithCat)? pipCodeFromBestwayWebsiteWithCat.split(" ")[1]:null;
+                        String pipCodeFromBestwayWebsite = !StringUtils.isEmpty(pipCodeFromBestwayWebsiteWithCat) && !pipCodeFromBestwayWebsiteWithCat.trim().equals("-")? pipCodeFromBestwayWebsiteWithCat.split(" ")[1]:null;
 
                         System.out.println("!!!!Bestway !!! Description:"+descFromBestwayWebsite+"; price:"+priceFromBestwayWebsite+"; stock"+stockAvailability(stockFromBestwayWebsite)+ "; pipcode"+pipCodeFromBestwayWebsite);
                         if(!StringUtils.isEmpty(pipCodeFromBestwayWebsite) && pipCodeFromBestwayWebsite.equals(!StringUtils.isEmpty(bestwayData.getCode()) ? bestwayData.getCode() : "")){
@@ -145,7 +147,7 @@ public class BestwayProcessService implements Callable<Map<OrderListKey, Set<Act
                         }
                         if(j%6 == 0){
                             System.out.println("Into this loop");
-                            j=1;
+                            j=0;
                             //click on next button
                             try{
                                 driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/div[1]/div[2]/div[4]/div[1]/ul[1]/li[3]/a[1]")).click();
@@ -155,10 +157,15 @@ public class BestwayProcessService implements Callable<Map<OrderListKey, Set<Act
                                 System.out.println("!!!!Bestway !!! There is no next button");
                             }
                         }
+                        if(actualJvalue>numberOfProducts){
+                            // the pip was not found in best way, so removing it from the cascade list
+                            System.out.println("!!!!Bestway !!! could not find any product with cascade pip code");
+                            bestwayData.setCode(null);
+                        }
 
                     }catch (Exception e){
                         e.printStackTrace();
-                        System.out.println("!!!!Bestway !!! It might be end of the list");
+                        System.out.println("!!!!Bestway !!! It might be end of the list "+bestwayDataSet);
                     }
                 }
 

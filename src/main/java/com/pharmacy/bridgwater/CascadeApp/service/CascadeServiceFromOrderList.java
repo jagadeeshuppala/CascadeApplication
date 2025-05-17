@@ -161,7 +161,7 @@ public class CascadeServiceFromOrderList {
 
         //click on choose button
         driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[2]/input[1]"))
-                .sendKeys(CASCADE_UPLOAD_FILE_BASE_LOCATION+CASCADE_UPLOAD_FILE_NAME);
+                .sendKeys(CASCADE_UPLOAD_FILE_BASE_LOCATION+"\\"+CASCADE_UPLOAD_FILE_NAME);
 
         //click on import button
         driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[3]/div[1]/div[2]/div[1]/div[3]/div[2]/button[1]"))
