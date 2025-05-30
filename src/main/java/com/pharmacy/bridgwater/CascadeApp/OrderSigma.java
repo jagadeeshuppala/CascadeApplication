@@ -4,6 +4,7 @@ import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
 import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
 import com.pharmacy.bridgwater.CascadeApp.model.SigmaOrderData;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -17,14 +18,18 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.io.*;
 import java.util.*;
 
-import static com.pharmacy.bridgwater.CascadeApp.CascadeResultsLocal.*;
+import static com.pharmacy.bridgwater.CascadeApp.CascadeResultsWithSigmaApp.*;
 import static com.pharmacy.bridgwater.CascadeApp.service.SigmaProcessService.stockAvailability;
 
 public class OrderSigma {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         OrderSigma orderSigma = new OrderSigma();
-        orderSigma.placeOrder(Arrays.asList(SigmaOrderData.builder().pip("1105865").quantity(5).build(), SigmaOrderData.builder().pip("5012448").quantity(2).build(), SigmaOrderData.builder().pip("1087105").quantity(2).build()));
+        //orderSigma.placeOrder(Arrays.asList(SigmaOrderData.builder().pip("1105865").quantity(5).build(), SigmaOrderData.builder().pip("5012448").quantity(2).build(), SigmaOrderData.builder().pip("1087105").quantity(2).build()));
+        List<SigmaOrderData> sigmaOrderDataList = orderSigma.getOrderListBasket();
+        orderSigma.placeOrder(sigmaOrderDataList);
+        //System.out.println(sigmaOrderDataList);
+
     }
 
     public List<SigmaOrderData> getOrderListBasket() throws IOException, InterruptedException {
@@ -43,6 +48,7 @@ public class OrderSigma {
                         && sheet.getRow(i).getCell(ORDER_LIST_PIP) != null
                         && sheet.getRow(i).getCell(ORDER_LIST_QTY) != null
                         && sheet.getRow(i).getCell(ORDER_LIST_FROM) != null
+                        && sheet.getRow(i).getCell(SIGMA_PIP_CELL) != null
 
                         && sheet.getRow(i).getCell(ORDER_LIST_DESC).getCellType() != CellType.BLANK
                         && !sheet.getRow(i).getCell(ORDER_LIST_DESC).toString().trim().equals("")
@@ -51,18 +57,19 @@ public class OrderSigma {
                         && sheet.getRow(i).getCell(ORDER_LIST_QTY).getCellType() != CellType.BLANK
                         && !sheet.getRow(i).getCell(ORDER_LIST_QTY).toString().trim().equals("")
                         && sheet.getRow(i).getCell(ORDER_LIST_FROM).getCellType() != CellType.BLANK
-                        && sheet.getRow(i).getCell(ORDER_LIST_DESC).toString().trim().equalsIgnoreCase(SIGMA_ORDERING_TEXT_IN_NOTES)
+                        && sheet.getRow(i).getCell(ORDER_LIST_FROM).toString().trim().equalsIgnoreCase(SIGMA_ORDERING_TEXT_IN_NOTES)
                         && sheet.getRow(i).getCell(SIGMA_PIP_CELL).getCellType() != CellType.BLANK
                         && !sheet.getRow(i).getCell(SIGMA_PIP_CELL).toString().trim().equals("")
                 ) {
                     try {
                         // xpath for add the order = "/html[1]/body[1]/article[1]/div[1]/div[3]/div[1]/dl[1]/div[1]/dd[1]/a[1]"
                         String pipToAddToBasket = sheet.getRow(i).getCell(SIGMA_PIP_CELL).toString();
-                        Integer quantity = Integer.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY).toString());
+                        Integer quantity = (int)Double.parseDouble(sheet.getRow(i).getCell(ORDER_LIST_QTY).toString());
                         sigmaOrderPipCodes.add(SigmaOrderData.builder().pip(pipToAddToBasket).quantity(quantity).build());
 
                     } catch (Exception e) {
                         System.out.println("value of i =" + i + "; and the exception is " + e.getMessage());
+
                     }
 
                 }
