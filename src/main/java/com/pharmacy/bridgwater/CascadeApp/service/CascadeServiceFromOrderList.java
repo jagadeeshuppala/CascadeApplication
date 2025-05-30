@@ -20,7 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.pharmacy.bridgwater.CascadeApp.CascadeResultsLocal.*;
+import static com.pharmacy.bridgwater.CascadeApp.CascadeResultsServer.*;
+
 
 public class CascadeServiceFromOrderList {
 

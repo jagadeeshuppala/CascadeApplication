@@ -18,7 +18,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.io.*;
 import java.util.*;
 
-import static com.pharmacy.bridgwater.CascadeApp.CascadeResultsWithSigmaApp.*;
+import static com.pharmacy.bridgwater.CascadeApp.CascadeResultsServer.*;
 import static com.pharmacy.bridgwater.CascadeApp.service.SigmaProcessService.stockAvailability;
 
 public class OrderSigma {
