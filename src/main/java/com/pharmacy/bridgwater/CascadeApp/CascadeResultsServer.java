@@ -5,7 +5,6 @@ import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
 import com.pharmacy.bridgwater.CascadeApp.service.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -24,16 +23,16 @@ import java.util.stream.Collectors;
 import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 
 
-public class CascadeResultsWithSigmaApp {
+public class CascadeResultsServer {
 
         public static final int ORDER_LIST_DESC_CELL = 0; public static final int CASCADE_DESC_CELL = 27; public static final int QUANTITY_CELL = 4;
         public static final int FROM_CELL=5; public static final int NOTES_CELL=6;public static final int TARRIF_CELL=28;
         public static final int TARIFF_AFTER_DEDUCTION_CELL=29;
         public static final int CONCESSION_CELL=30; public static final int ORDER_LIST_PIP_CODE_CELL=31; public static final int AAH_PRICE_CELL=7;public static final int AAH_PIP_CELL=32;
-        public static final int BESTWAY_PRICE_CELL=8;public static final int BESTWAY_PIP_CELL=33;public static final int BNS_PRICE_CELL=9;public static final int BNS_PIP_CELL=34;
-        public static final int LEXON_PRICE_CELL=10;public static final int LEXON_PIP_CELL=35;public static final int OTC_PRICE_CELL=11;public static final int OTC_PIP_CELL=36;
-        public static final int SIGMA_PRICE_CELL = 12; public static final int SIGMA_PIP_CELL=37;
-        public static final int TRIDENT_PRICE_CELL=13;public static final int TRIDENT_PIP_CELL=38;/*public static final int ALLIANCE_PRICE_CELL=14;*/
+        public static final int BESTWAY_PRICE_CELL=8;public static final int BESTWAY_PIP_CELL=33;public static final int BNS_PRICE_CELL=10;public static final int BNS_PIP_CELL=34;
+        public static final int LEXON_PRICE_CELL=11;public static final int LEXON_PIP_CELL=35;public static final int OTC_PRICE_CELL=12;public static final int OTC_PIP_CELL=36;
+        public static final int SIGMA_PRICE_CELL = 13; public static final int SIGMA_PIP_CELL=37;
+        public static final int TRIDENT_PRICE_CELL=14;public static final int TRIDENT_PIP_CELL=38;/*public static final int ALLIANCE_PRICE_CELL=14;*/
         public static final int ALLIANCE_PIP_CELL=39;public static final int LOOKED_UP_AT=49;
         public static final int AAH_CASCADE_PRICE_CELL=40; public static final int AAH_CASCADE_STATUS_CELL=41; public static final int AAH_CASCADE_PIP_CELL=42;
         public static final int BESTWAY_CASCADE_PRICE_CELL=43;public static final int BESTWAY_CASCADE_STATUS_CELL = 44 ;public static final int BESTWAY_CASCADE_PIP_CELL=45;
@@ -41,14 +40,15 @@ public class CascadeResultsWithSigmaApp {
         public static final int TRIDENT_CASCADE_PRICE_CELL=46;public static final int TRIDENT_CASCADE_STATUS_CELL=47; public static final int TRIDENT_CASCADE_PIP_CELL=48;
 
         //In Pharmacy
+
         public static final String ORIGINAL_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList1.xlsx";
-        public static final String WORK_TO_BE_DONE_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList_Copy_copy.xlsx";
-        public static final String COPIED_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList_Copy_copy.xlsx";
+        public static final String WORK_TO_BE_DONE_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList1.xlsx";
+        public static final String COPIED_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList-JagCopy.xlsx";
 
         //At Home
         /*public static final String ORIGINAL_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1.xlsx";
-        public static final String WORK_TO_BE_DONE_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1_copu.xlsx";
-        public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1_copu.xlsx";*/
+        public static final String WORK_TO_BE_DONE_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1.xlsx";
+        public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy_copy.xlsx";*/
 
         public static final String CASCADE_UPLOAD_FILE_NAME = "upload.csv";
         public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
@@ -545,9 +545,9 @@ public class CascadeResultsWithSigmaApp {
                         }
 
                         //OTC
-                        Cell cell17 = row.createCell(OTC_PRICE_CELL);
+                        /*Cell cell17 = row.createCell(OTC_PRICE_CELL);
                         cell17.setCellValue("");
-                        cell17.setCellStyle(normalFontStyle);
+                        cell17.setCellStyle(normalFontStyle);*/
 
                         //OTC PIP
                         Cell cell18 = row.createCell(OTC_PIP_CELL);
