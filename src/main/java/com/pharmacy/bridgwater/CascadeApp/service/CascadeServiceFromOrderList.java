@@ -33,15 +33,16 @@ public class CascadeServiceFromOrderList {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         CascadeServiceFromOrderList cascadeApp = new CascadeServiceFromOrderList();
-        Map<OrderListKey, Set<ActualSupplierData>> cascadeResults = cascadeApp.getCascadeResult();
+
+        Map<OrderListKey, Set<ActualSupplierData>> cascadeResults = cascadeApp.getCascadeResult(WORK_TO_BE_DONE_FILE_NAME);
     }
 
 
-    public Map<OrderListKey, Set<ActualSupplierData>> getCascadeResult() throws IOException, InterruptedException {
+    public Map<OrderListKey, Set<ActualSupplierData>> getCascadeResult(String workToBeDoneFileName) throws IOException, InterruptedException {
 
 
 
-        FileInputStream file = new FileInputStream(WORK_TO_BE_DONE_FILE_NAME);
+        FileInputStream file = new FileInputStream(workToBeDoneFileName);
         Workbook workbook = new XSSFWorkbook(file);
         Sheet sheet = workbook.getSheetAt(0);
 

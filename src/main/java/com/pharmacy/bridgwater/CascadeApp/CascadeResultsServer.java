@@ -25,19 +25,6 @@ import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 
 public class CascadeResultsServer {
 
-        public static final int ORDER_LIST_DESC_CELL = 0; public static final int CASCADE_DESC_CELL = 27; public static final int QUANTITY_CELL = 4;
-        public static final int FROM_CELL=5; public static final int NOTES_CELL=6;public static final int TARRIF_CELL=28;
-        public static final int TARIFF_AFTER_DEDUCTION_CELL=29;
-        public static final int CONCESSION_CELL=30; public static final int ORDER_LIST_PIP_CODE_CELL=31; public static final int AAH_PRICE_CELL=7;public static final int AAH_PIP_CELL=32;
-        public static final int BESTWAY_PRICE_CELL=8;public static final int BESTWAY_PIP_CELL=33;public static final int BNS_PRICE_CELL=10;public static final int BNS_PIP_CELL=34;
-        public static final int LEXON_PRICE_CELL=11;public static final int LEXON_PIP_CELL=35;public static final int OTC_PRICE_CELL=12;public static final int OTC_PIP_CELL=36;
-        public static final int SIGMA_PRICE_CELL = 13; public static final int SIGMA_PIP_CELL=37;
-        public static final int TRIDENT_PRICE_CELL=14;public static final int TRIDENT_PIP_CELL=38;/*public static final int ALLIANCE_PRICE_CELL=14;*/
-        public static final int ALLIANCE_PIP_CELL=39;public static final int LOOKED_UP_AT=49;
-        public static final int AAH_CASCADE_PRICE_CELL=40; public static final int AAH_CASCADE_STATUS_CELL=41; public static final int AAH_CASCADE_PIP_CELL=42;
-        public static final int BESTWAY_CASCADE_PRICE_CELL=43;public static final int BESTWAY_CASCADE_STATUS_CELL = 44 ;public static final int BESTWAY_CASCADE_PIP_CELL=45;
-        //public static final int SIGMA_CASCADE_PRICE_CELL=46;public static final int SIGMA_CASCADE_STATUS_CELL=47; public static final int SIGMA_CASCADE_PIP_CELL=48;
-        public static final int TRIDENT_CASCADE_PRICE_CELL=46;public static final int TRIDENT_CASCADE_STATUS_CELL=47; public static final int TRIDENT_CASCADE_PIP_CELL=48;
 
         //In Pharmacy
 
@@ -135,7 +122,7 @@ public class CascadeResultsServer {
 
 
                 CascadeServiceFromOrderList cascade = new CascadeServiceFromOrderList();
-                Map<OrderListKey, Set<ActualSupplierData>> cascadeResults =  cascade.getCascadeResult();
+                Map<OrderListKey, Set<ActualSupplierData>> cascadeResults =  cascade.getCascadeResult(WORK_TO_BE_DONE_FILE_NAME);
                 Map<OrderListKey, Set<String>> sigmaPipCodes =  new LinkedHashMap<>();
                 for (Map.Entry<OrderListKey, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
                         sigmaPipCodes.put(entry.getKey(), entry.getValue().stream().filter(v -> !StringUtils.isEmpty(v.getCode())).map(ActualSupplierData::getCode).collect(Collectors.toSet()));
@@ -627,7 +614,7 @@ public class CascadeResultsServer {
                         }
 
                         //Alliance
-                        /*Cell cell23 = row.createCell(ALLIANCE_PRICE_CELL);
+                        Cell cell23 = row.createCell(ALLIANCE_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperAllianceData && null != cheaperPrice ){
                                 //if cheaper is Alliance, and available then yellow back with green -- greenBoldFontStyle
@@ -650,7 +637,7 @@ public class CascadeResultsServer {
                                 }
                         }else{
                                 //cell23.setCellValue("NS");
-                        }*/
+                        }
 
                         //Alliance pip
                         Cell cell24 = row.createCell(ALLIANCE_PIP_CELL);
@@ -744,7 +731,7 @@ public class CascadeResultsServer {
 
                         Cell cell25 = row.createCell(LOOKED_UP_AT);
                         LocalDateTime now = LocalDateTime.now();
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm");
                         String formattedDateTime = now.format(formatter);
                         cell25.setCellValue(formattedDateTime);
                         cell25.setCellStyle(normalFontStyle);

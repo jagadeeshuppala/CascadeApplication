@@ -25,20 +25,6 @@ import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 
 public class CascadeResultsLocal {
 
-        public static final int ORDER_LIST_DESC_CELL = 0; public static final int CASCADE_DESC_CELL = 27; public static final int QUANTITY_CELL = 4;
-        public static final int FROM_CELL=5; public static final int NOTES_CELL=6;public static final int TARRIF_CELL=28;
-        public static final int TARIFF_AFTER_DEDUCTION_CELL=29;
-        public static final int CONCESSION_CELL=30; public static final int ORDER_LIST_PIP_CODE_CELL=31; public static final int AAH_PRICE_CELL=7;public static final int AAH_PIP_CELL=32;
-        public static final int BESTWAY_PRICE_CELL=8;public static final int BESTWAY_PIP_CELL=33;public static final int BNS_PRICE_CELL=10;public static final int BNS_PIP_CELL=34;
-        public static final int LEXON_PRICE_CELL=11;public static final int LEXON_PIP_CELL=35;public static final int OTC_PRICE_CELL=12;public static final int OTC_PIP_CELL=36;
-        public static final int SIGMA_PRICE_CELL = 13; public static final int SIGMA_PIP_CELL=37;
-        public static final int TRIDENT_PRICE_CELL=14;public static final int TRIDENT_PIP_CELL=38;/*public static final int ALLIANCE_PRICE_CELL=14;*/
-        public static final int ALLIANCE_PIP_CELL=39;public static final int LOOKED_UP_AT=49;
-        public static final int AAH_CASCADE_PRICE_CELL=40; public static final int AAH_CASCADE_STATUS_CELL=41; public static final int AAH_CASCADE_PIP_CELL=42;
-        public static final int BESTWAY_CASCADE_PRICE_CELL=43;public static final int BESTWAY_CASCADE_STATUS_CELL = 44 ;public static final int BESTWAY_CASCADE_PIP_CELL=45;
-        //public static final int SIGMA_CASCADE_PRICE_CELL=46;public static final int SIGMA_CASCADE_STATUS_CELL=47; public static final int SIGMA_CASCADE_PIP_CELL=48;
-        public static final int TRIDENT_CASCADE_PRICE_CELL=46;public static final int TRIDENT_CASCADE_STATUS_CELL=47; public static final int TRIDENT_CASCADE_PIP_CELL=48;
-
         //In Pharmacy
 
         /*public static final String ORIGINAL_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList1.xlsx";
@@ -49,6 +35,10 @@ public class CascadeResultsLocal {
         public static final String ORIGINAL_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1.xlsx";
         public static final String WORK_TO_BE_DONE_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1.xlsx";
         public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy_copy.xlsx";
+
+        /*public static final String ORIGINAL_FILE_NAME = "C:\\Users\\uppal\\Desktop\\OrderList1.xlsx";
+        public static final String WORK_TO_BE_DONE_FILE_NAME = "C:\\Users\\uppal\\Desktop\\OrderList1.xlsx";
+        public static final String COPIED_FILE_NAME = "C:\\Users\\uppal\\Desktop\\OrderList_Copy_copy.xlsx";*/
 
         public static final String CASCADE_UPLOAD_FILE_NAME = "upload.csv";
         public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
@@ -78,7 +68,9 @@ public class CascadeResultsLocal {
                 //updating the file with the results
                 FileInputStream file = new FileInputStream(WORK_TO_BE_DONE_FILE_NAME);
                 Workbook workbook = new XSSFWorkbook(file);
-                Sheet my_sheet = workbook.getSheetAt(0);
+                Sheet sheet0 = workbook.getSheetAt(0);
+
+
 
                 // normalFont
                 CellStyle normalFontStyle = workbook.createCellStyle();
@@ -135,7 +127,7 @@ public class CascadeResultsLocal {
 
 
                 CascadeServiceFromOrderList cascade = new CascadeServiceFromOrderList();
-                Map<OrderListKey, Set<ActualSupplierData>> cascadeResults =  cascade.getCascadeResult();
+                Map<OrderListKey, Set<ActualSupplierData>> cascadeResults =  cascade.getCascadeResult(WORK_TO_BE_DONE_FILE_NAME);
                 Map<OrderListKey, Set<String>> sigmaPipCodes =  new LinkedHashMap<>();
                 for (Map.Entry<OrderListKey, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
                         sigmaPipCodes.put(entry.getKey(), entry.getValue().stream().filter(v -> !StringUtils.isEmpty(v.getCode())).map(ActualSupplierData::getCode).collect(Collectors.toSet()));
@@ -331,16 +323,16 @@ public class CascadeResultsLocal {
 
 
 
-                        Row row = my_sheet.getRow(key.getSno());
+                        Row sheet0Row = sheet0.getRow(key.getSno());
 
 
                         //Order list desc
-                        Cell cell0 = row.createCell(ORDER_LIST_DESC_CELL);
+                        Cell cell0 = sheet0Row.createCell(ORDER_LIST_DESC_CELL);
                         cell0.setCellValue(key.getOrderListDesc());
                         cell0.setCellStyle(normalFontStyle);
 
                         //Cascade Desc
-                        Cell cell1 = row.createCell(CASCADE_DESC_CELL);
+                       Cell cell1 = sheet0Row.createCell(CASCADE_DESC_CELL);
                         if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getTariff()!=null){
                                 cell1.setCellValue(cascadeDataForProductDesc.getDescription());
                         }else{
@@ -368,7 +360,7 @@ public class CascadeResultsLocal {
                         cell4.setCellStyle(normalFontStyle);*/
 
                         //Tariff
-                        Cell cell5 = row.createCell(TARRIF_CELL);
+                        Cell cell5 = sheet0Row.createCell(TARRIF_CELL);
                         if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getTariff()!=null){
                                 cell5.setCellValue(cascadeDataForProductDesc.getTariff());
                         }else{
@@ -377,7 +369,7 @@ public class CascadeResultsLocal {
                         cell5.setCellStyle(normalFontStyle);
 
                         //TariffAfterDeduction
-                        Cell cell6 = row.createCell(TARIFF_AFTER_DEDUCTION_CELL);
+                        Cell cell6 = sheet0Row.createCell(TARIFF_AFTER_DEDUCTION_CELL);
                         if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getTariffAfterDeduction()!=null){
                                 cell6.setCellValue(cascadeDataForProductDesc.getTariffAfterDeduction());
                         }else{
@@ -386,7 +378,7 @@ public class CascadeResultsLocal {
                         cell6.setCellStyle(normalFontStyle);
 
                         //concession
-                        Cell cell7 = row.createCell(CONCESSION_CELL);
+                        Cell cell7 = sheet0Row.createCell(CONCESSION_CELL);
                         if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getConcession()!=null){
                                 cell7.setCellValue(cascadeDataForProductDesc.getConcession());
                         }else {
@@ -394,13 +386,13 @@ public class CascadeResultsLocal {
                         }
                         cell7.setCellStyle(normalFontStyle);
                         //ordercode
-                        Cell cell8 = row.createCell(ORDER_LIST_PIP_CODE_CELL);
+                        Cell cell8 = sheet0Row.createCell(ORDER_LIST_PIP_CODE_CELL);
                         cell8.setCellValue(key.getOrderListPipCode());
                         cell8.setCellStyle(normalFontStyle);
 
 
                         //AAH price
-                        Cell cell9 = row.createCell(AAH_PRICE_CELL);
+                        Cell cell9 = sheet0Row.createCell(AAH_PRICE_CELL);
                         cell9.getCellStyle().setDataFormat(workbook.createDataFormat().getFormat("0.00"));
                         //If both are null, ie. its not stocked
                         if(null != cheaperAahData){
@@ -427,7 +419,7 @@ public class CascadeResultsLocal {
                         }
 
                         //AAH pip
-                        Cell cell10 = row.createCell(AAH_PIP_CELL);
+                        Cell cell10 = sheet0Row.createCell(AAH_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperAahData  ){
                                 //get the cheaper AAH's pip
@@ -437,7 +429,7 @@ public class CascadeResultsLocal {
                         }
 
                         //Bestway
-                        Cell cell11 = row.createCell(BESTWAY_PRICE_CELL);
+                        Cell cell11 = sheet0Row.createCell(BESTWAY_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBestwayData && null != cheaperPrice ){
                                 //if cheaper is bestway, and available then yellow back with green -- greenBoldFontStyle
@@ -463,7 +455,7 @@ public class CascadeResultsLocal {
                         }
 
                         //Bestway pip
-                        Cell cell12 = row.createCell(BESTWAY_PIP_CELL);
+                        Cell cell12 = sheet0Row.createCell(BESTWAY_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBestwayData  ){
                                 //get the cheaper AAH's pip
@@ -473,7 +465,7 @@ public class CascadeResultsLocal {
                         }
 
                         //BNS
-                        Cell cell13 = row.createCell(BNS_PRICE_CELL);
+                        Cell cell13 = sheet0Row.createCell(BNS_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBnsData && null != cheaperPrice ){
                                 //if cheaper is bns, and available then yellow back with green -- greenBoldFontStyle
@@ -499,7 +491,7 @@ public class CascadeResultsLocal {
                         }
 
                         //BNS pip
-                        Cell cell14 = row.createCell(BNS_PIP_CELL);
+                        Cell cell14 = sheet0Row.createCell(BNS_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBnsData  ){
                                 //get the cheaper BNS's pip
@@ -509,7 +501,7 @@ public class CascadeResultsLocal {
                         }
 
                         //Lexon
-                        Cell cell15 = row.createCell(LEXON_PRICE_CELL);
+                        Cell cell15 = sheet0Row.createCell(LEXON_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperLexonData && null != cheaperPrice ){
                                 //if cheaper is Lexon, and available then yellow back with green -- greenBoldFontStyle
@@ -535,7 +527,7 @@ public class CascadeResultsLocal {
                         }
 
                         //Lexon pip
-                        Cell cell16 = row.createCell(LEXON_PIP_CELL);
+                        Cell cell16 = sheet0Row.createCell(LEXON_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperLexonData  ){
                                 //get the cheaper BNS's pip
@@ -550,12 +542,12 @@ public class CascadeResultsLocal {
                         cell17.setCellStyle(normalFontStyle);*/
 
                         //OTC PIP
-                        Cell cell18 = row.createCell(OTC_PIP_CELL);
+                        Cell cell18 = sheet0Row.createCell(OTC_PIP_CELL);
                         cell18.setCellValue("");
                         cell18.setCellStyle(normalFontStyle);
 
                         //Sigma
-                        Cell cell19 = row.createCell(SIGMA_PRICE_CELL);
+                        Cell cell19 = sheet0Row.createCell(SIGMA_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperSigmaData && null != cheaperPrice ){
                                 //if cheaper is Sigma, and available then yellow back with green -- greenBoldFontStyle
@@ -581,7 +573,7 @@ public class CascadeResultsLocal {
                         }
 
                         //Sigma pip
-                        Cell cell20 = row.createCell(SIGMA_PIP_CELL);
+                        Cell cell20 = sheet0Row.createCell(SIGMA_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperSigmaData  ){
                                 //get the cheaper Sigma's pip
@@ -591,7 +583,7 @@ public class CascadeResultsLocal {
                         }
 
                         //Trident
-                        Cell cell21 = row.createCell(TRIDENT_PRICE_CELL);
+                        Cell cell21 = sheet0Row.createCell(TRIDENT_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperTridentData && null != cheaperPrice ){
                                 //if cheaper is Trident, and available then yellow back with green -- greenBoldFontStyle
@@ -617,7 +609,7 @@ public class CascadeResultsLocal {
                         }
 
                         //Trident pip
-                        Cell cell22 = row.createCell(TRIDENT_PIP_CELL);
+                        Cell cell22 = sheet0Row.createCell(TRIDENT_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperTridentData  ){
                                 //get the cheaper Trident's pip
@@ -627,7 +619,7 @@ public class CascadeResultsLocal {
                         }
 
                         //Alliance
-                        /*Cell cell23 = row.createCell(ALLIANCE_PRICE_CELL);
+                        Cell cell23 = sheet0Row.createCell(ALLIANCE_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperAllianceData && null != cheaperPrice ){
                                 //if cheaper is Alliance, and available then yellow back with green -- greenBoldFontStyle
@@ -650,10 +642,10 @@ public class CascadeResultsLocal {
                                 }
                         }else{
                                 //cell23.setCellValue("NS");
-                        }*/
+                        }
 
                         //Alliance pip
-                        Cell cell24 = row.createCell(ALLIANCE_PIP_CELL);
+                        Cell cell24 = sheet0Row.createCell(ALLIANCE_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperAllianceData  ){
                                 //get the cheaper Trident's pip
@@ -669,39 +661,39 @@ public class CascadeResultsLocal {
         */
 
                         //AAH Cascade price
-                        Cell cell26 = row.createCell(AAH_CASCADE_PRICE_CELL);
+                        Cell cell26 = sheet0Row.createCell(AAH_CASCADE_PRICE_CELL);
                         if(null !=cheaperAahData && null != cheaperAahData.getCascadePrice()){
                                 cell26.setCellValue(cheaperAahData.getCascadePrice());
                                 /*cell26.setCellStyle(accountingFontStyle);*/
                         }
 
                         //AAH Cascade status
-                        Cell cell27 = row.createCell(AAH_CASCADE_STATUS_CELL);
+                        Cell cell27 = sheet0Row.createCell(AAH_CASCADE_STATUS_CELL);
                         if(null !=cheaperAahData && null != cheaperAahData.getCascadeStatus()){
                                 cell27.setCellValue(cheaperAahData.getCascadeStatus());
                         }
 
                         //AAH Cascade PIP
-                        Cell cell28 = row.createCell(AAH_CASCADE_PIP_CELL);
+                        Cell cell28 = sheet0Row.createCell(AAH_CASCADE_PIP_CELL);
                         if(null !=cheaperAahData && null != cheaperAahData.getCascadeCode()){
                                 cell28.setCellValue(cheaperAahData.getCascadeCode());
                         }
 
                         //
                         //Bestway Cascade price
-                        Cell cell29 = row.createCell(BESTWAY_CASCADE_PRICE_CELL);
+                        Cell cell29 = sheet0Row.createCell(BESTWAY_CASCADE_PRICE_CELL);
                         if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadePrice()){
                                 cell29.setCellValue(cheaperBestwayData.getCascadePrice());
                         }
 
                         //Bestway Cascade status
-                        Cell cell30 = row.createCell(BESTWAY_CASCADE_STATUS_CELL);
+                        Cell cell30 = sheet0Row.createCell(BESTWAY_CASCADE_STATUS_CELL);
                         if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadeStatus()){
                                 cell30.setCellValue(cheaperBestwayData.getCascadeStatus());
                         }
 
                         //Bestway Cascade PIP
-                        Cell cell31 = row.createCell(BESTWAY_CASCADE_PIP_CELL);
+                        Cell cell31 = sheet0Row.createCell(BESTWAY_CASCADE_PIP_CELL);
                         if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadeCode()){
                                 cell31.setCellValue(cheaperBestwayData.getCascadeCode());
                         }
@@ -725,26 +717,26 @@ public class CascadeResultsLocal {
                         }*/
 
                         //Trident Cascade price
-                        Cell cell35 = row.createCell(TRIDENT_CASCADE_PRICE_CELL);
+                        Cell cell35 = sheet0Row.createCell(TRIDENT_CASCADE_PRICE_CELL);
                         if(null !=cheaperTridentData && null != cheaperTridentData.getCascadePrice()){
                                 cell35.setCellValue(cheaperTridentData.getCascadePrice());
                         }
 
                         //Trident Cascade status
-                        Cell cell36 = row.createCell(TRIDENT_CASCADE_STATUS_CELL);
+                        Cell cell36 = sheet0Row.createCell(TRIDENT_CASCADE_STATUS_CELL);
                         if(null !=cheaperTridentData && null != cheaperTridentData.getCascadeStatus()){
                                 cell36.setCellValue(cheaperTridentData.getCascadeStatus());
                         }
 
                         //Trident Cascade PIP
-                        Cell cell37 = row.createCell(TRIDENT_CASCADE_PIP_CELL);
+                        Cell cell37 = sheet0Row.createCell(TRIDENT_CASCADE_PIP_CELL);
                         if(null !=cheaperTridentData && null != cheaperTridentData.getCascadeCode()){
                                 cell37.setCellValue(cheaperTridentData.getCascadeCode());
                         }
 
-                        Cell cell25 = row.createCell(LOOKED_UP_AT);
+                        Cell cell25 = sheet0Row.createCell(LOOKED_UP_AT);
                         LocalDateTime now = LocalDateTime.now();
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm");
                         String formattedDateTime = now.format(formatter);
                         cell25.setCellValue(formattedDateTime);
                         cell25.setCellStyle(normalFontStyle);

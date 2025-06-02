@@ -19,6 +19,7 @@ import java.io.*;
 import java.util.*;
 
 import static com.pharmacy.bridgwater.CascadeApp.CascadeResultsServer.*;
+import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.SIGMA_PIP_CELL;
 import static com.pharmacy.bridgwater.CascadeApp.service.SigmaProcessService.stockAvailability;
 
 public class OrderSigma {
