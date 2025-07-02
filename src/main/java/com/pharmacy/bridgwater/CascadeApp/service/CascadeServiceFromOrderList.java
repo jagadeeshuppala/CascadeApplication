@@ -34,7 +34,7 @@ public class CascadeServiceFromOrderList {
     public static void main(String[] args) throws IOException, InterruptedException {
         CascadeServiceFromOrderList cascadeApp = new CascadeServiceFromOrderList();
 
-        Map<OrderListKey, Set<ActualSupplierData>> cascadeResults = cascadeApp.getCascadeResult(WORK_TO_BE_DONE_FILE_NAME);
+        Map<OrderListKey, Set<ActualSupplierData>> cascadeResults = cascadeApp.getCascadeResult(WORK_TO_BE_DONE_FILE_NAME_FOR_SIGMA);
     }
 
 
