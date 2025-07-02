@@ -274,6 +274,7 @@ public class CascadeServiceFromOrderList {
 
         Map<String, Set<ActualSupplierData>> cascadeProductList = new LinkedHashMap<>();
         int noOfProducts  = totalNoOfProducts;
+        int dummyDescription = 0;
         for(int actualValue=1; actualValue<=totalNoOfProducts; actualValue++){
             System.out.println("!!!! Sno: " + actualValue+ " Still remaining products: " + --noOfProducts);
             driver.get("https://victoria-os.com/UI/VicOrdering/Expanded?orderId="+orderId+"&lineNo="+actualValue);
@@ -295,7 +296,7 @@ public class CascadeServiceFromOrderList {
                     descriptionFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+j+"]/td[2]")).getText();
                     String supplier =driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+j+"]/td[3]")).getText();
                     String price =driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+j+"]/td[4]")).getText();
-                    Double priceInDouble = price!=null?Double.valueOf(price):null;
+                    Double priceInDouble = StringUtils.isEmpty(price)?null: Double.valueOf(price);
                     String code =driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr["+j+"]/td[7]")).getText();
                     String availability = "Not Available";
                     try{
@@ -328,6 +329,9 @@ public class CascadeServiceFromOrderList {
                 }
                 if(descriptionFromWebsite!=null){
                     cascadeProductList.put(descriptionFromWebsite, cascadeSupplierList);
+                }else{
+                    dummyDescription++;
+                    cascadeProductList.put("dummy"+dummyDescription, cascadeSupplierList);
                 }
 
 
