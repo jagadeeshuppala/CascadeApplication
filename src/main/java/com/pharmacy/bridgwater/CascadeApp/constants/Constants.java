@@ -20,10 +20,10 @@ public class Constants {
     public static final int TARRIF_CELL=17;
     public static final int TARIFF_AFTER_DEDUCTION_CELL=18;
     public static final int CONCESSION_CELL=19; public static final int ORDER_LIST_PIP_CODE_CELL=37;
-    public static final int AAH_PRICE_CELL=8;public static final int AAH_PIP_CELL=21;
-    public static final int BESTWAY_PRICE_CELL=9;public static final int BESTWAY_PIP_CELL=22;
-    public static final int BNS_PRICE_CELL=11;public static final int BNS_PIP_CELL=23;
-    public static final int LEXON_PRICE_CELL=12;public static final int LEXON_PIP_CELL=24;
+    public static final int AAH_PRICE_CELL=11;public static final int AAH_PIP_CELL=21;
+    public static final int BESTWAY_PRICE_CELL=12;public static final int BESTWAY_PIP_CELL=22;
+    public static final int BNS_PRICE_CELL=10;public static final int BNS_PIP_CELL=23;
+    public static final int LEXON_PRICE_CELL=13;public static final int LEXON_PIP_CELL=24;
     public static final int OTC_PRICE_CELL=12;public static final int OTC_PIP_CELL=36;
     public static final int SIGMA_PRICE_CELL = 14; public static final int SIGMA_PIP_CELL=25;
     public static final int TRIDENT_PRICE_CELL=15;public static final int TRIDENT_PIP_CELL=26;
