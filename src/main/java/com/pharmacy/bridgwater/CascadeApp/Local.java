@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 
 
-public class CascadeResultsLocal {
+public class Local {
 
         //In Pharmacy
 

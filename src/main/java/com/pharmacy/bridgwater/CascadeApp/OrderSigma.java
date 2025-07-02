@@ -4,7 +4,6 @@ import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
 import com.pharmacy.bridgwater.CascadeApp.model.OrderListKey;
 import com.pharmacy.bridgwater.CascadeApp.model.SigmaOrderData;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -18,7 +17,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.io.*;
 import java.util.*;
 
-import static com.pharmacy.bridgwater.CascadeApp.CascadeResultsServer.*;
+import static com.pharmacy.bridgwater.CascadeApp.Server.*;
 import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.SIGMA_PIP_CELL;
 import static com.pharmacy.bridgwater.CascadeApp.service.SigmaProcessService.stockAvailability;
 
