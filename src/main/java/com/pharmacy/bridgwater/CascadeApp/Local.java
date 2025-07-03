@@ -327,9 +327,9 @@ public class Local {
 
 
                         //Order list desc
-                        Cell cell0 = sheet0Row.createCell(ORDER_LIST_DESC_CELL);
+                        /*Cell cell0 = sheet0Row.createCell(ORDER_LIST_DESC_CELL);
                         cell0.setCellValue(key.getOrderListDesc());
-                        cell0.setCellStyle(normalFontStyle);
+                        cell0.setCellStyle(normalFontStyle);*/
 
                         //Cascade Desc
                        Cell cell1 = sheet0Row.createCell(CASCADE_DESC_CELL);
