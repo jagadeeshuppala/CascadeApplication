@@ -32,9 +32,9 @@ public class Desktop {
         public static final String COPIED_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList-JagCopy.xlsx";*/
 
         //At Home
-        public static final String ORIGINAL_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1.xlsx";
-        public static final String WORK_TO_BE_DONE_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1.xlsx";
-        public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy_copy.xlsx";
+        public static final String ORIGINAL_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OL.xlsx";
+        public static final String WORK_TO_BE_DONE_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OL.xlsx";
+        public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OL_Backup.xlsx";
 
         /*public static final String ORIGINAL_FILE_NAME = "C:\\Users\\uppal\\Desktop\\OrderList1.xlsx";
         public static final String WORK_TO_BE_DONE_FILE_NAME = "C:\\Users\\uppal\\Desktop\\OrderList1.xlsx";
