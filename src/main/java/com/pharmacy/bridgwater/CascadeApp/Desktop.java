@@ -242,7 +242,9 @@ public class Desktop {
                 for (Map.Entry<OrderListKey, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
                         OrderListKey key = entry.getKey();
                         Set<ActualSupplierData> value = entry.getValue();
-
+                        if(value.isEmpty()){
+                            return;
+                        }
                         ActualSupplierData cheaperAahData = value.stream()
                                 .filter(v-> SUPPLIER_AAH.equalsIgnoreCase(v.getSupplier()))
                                 .filter(v-> v.getPrice()!=null)
