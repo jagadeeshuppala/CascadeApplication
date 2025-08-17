@@ -16,7 +16,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -24,6 +23,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
 
 import static com.pharmacy.bridgwater.CascadeApp.Server.*;
 import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
@@ -83,9 +83,10 @@ public class CascadeServiceFromOrderList {
                         && !sheet.getRow(i).getCell(ORDER_LIST_QTY).toString().trim().equals("")
                         &&(sheet.getRow(i).getCell(ORDER_LIST_FROM).getCellType()== CellType.BLANK || sheet.getRow(i).getCell(ORDER_LIST_FROM).toString().trim().equals(""))
 
-                        &&sheet.getRow(i).getCell(LOOKED_UP_AT).getCellType() != CellType.BLANK
-                        && !sheet.getRow(i).getCell(LOOKED_UP_AT).toString().trim().equals("")
-                        && LocalDate.parse(sheet.getRow(i).getCell(LOOKED_UP_AT).toString(), formatter).isBefore(LocalDate.now())
+
+
+                        &&((sheet.getRow(i).getCell(LOOKED_UP_AT).getCellType() != CellType.BLANK && !sheet.getRow(i).getCell(LOOKED_UP_AT).toString().trim().equals(""))?
+                         LocalDate.parse(sheet.getRow(i).getCell(LOOKED_UP_AT).toString(), formatter).isBefore(LocalDate.now()): true)
                 ) {
                     try{
 

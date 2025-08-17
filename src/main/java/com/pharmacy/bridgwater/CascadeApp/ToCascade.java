@@ -14,12 +14,12 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.pharmacy.bridgwater.CascadeApp.Desktop.WORK_TO_BE_DONE_FILE_NAME;
+
 import static com.pharmacy.bridgwater.CascadeApp.Server.*;
 import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 
 
-public class CascadeBasket {
+public class ToCascade {
 
 
 
@@ -28,7 +28,7 @@ public class CascadeBasket {
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        CascadeBasket cascadeApp = new CascadeBasket();
+        ToCascade cascadeApp = new ToCascade();
 
         cascadeApp.placeOrder(WORK_TO_BE_DONE_FILE_NAME);
     }
@@ -53,7 +53,6 @@ public class CascadeBasket {
 
             for (int i = 1; i <= sheet.getLastRowNum() && sheet.getRow(i) != null  ; i++) {
                 if( sheet.getRow(i).getCell(ORDER_LIST_FROM) != null
-                        && sheet.getRow(i).getCell(SIGMA_PIP_CELL) != null
                         && sheet.getRow(i).getCell(ORDER_LIST_FROM).getCellType() != CellType.BLANK
                         &&sheet.getRow(i).getCell(ORDER_LIST_FROM).toString().trim().equalsIgnoreCase("DD")
 

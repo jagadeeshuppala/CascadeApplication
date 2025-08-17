@@ -17,19 +17,18 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.io.*;
 import java.util.*;
 
-//import static com.pharmacy.bridgwater.CascadeApp.Server.*;
-import static com.pharmacy.bridgwater.CascadeApp.Desktop.WORK_TO_BE_DONE_FILE_NAME;
+import static com.pharmacy.bridgwater.CascadeApp.Server.*;
 
 import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 import static com.pharmacy.bridgwater.CascadeApp.service.SigmaProcessService.stockAvailability;
 
-public class SigmaBasket {
+public class ToSigma {
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        SigmaBasket sigmaBasket = new SigmaBasket();
+        ToSigma toSigma = new ToSigma();
         //orderSigma.placeOrder(Arrays.asList(SigmaOrderData.builder().pip("1105865").quantity(5).build(), SigmaOrderData.builder().pip("5012448").quantity(2).build(), SigmaOrderData.builder().pip("1087105").quantity(2).build()));
-        List<SigmaOrderData> sigmaOrderDataList = sigmaBasket.getOrderListBasket();
-        sigmaBasket.placeOrder(sigmaOrderDataList);
+        List<SigmaOrderData> sigmaOrderDataList = toSigma.getOrderListBasket();
+        toSigma.placeOrder(sigmaOrderDataList);
         //System.out.println(sigmaOrderDataList);
 
     }

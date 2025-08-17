@@ -29,32 +29,30 @@ import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 
 public class Server {
 
-
         //In Pharmacy
 
-        public static final String ORIGINAL_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OL.xlsx";
-        public static final String WORK_TO_BE_DONE_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OL.xlsx";
-        public static final String WORK_TO_BE_DONE_FILE_NAME_FOR_SIGMA = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList.xlsx";
-        public static final String COPIED_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OL_Backup.xlsx";
+    public static final String ORIGINAL_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OL.xlsx";
+    public static final String WORK_TO_BE_DONE_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OL.xlsx";
+    public static final String WORK_TO_BE_DONE_FILE_NAME_FOR_SIGMA = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OrderList.xlsx";
+    public static final String COPIED_FILE_NAME = "\\\\11701279QSVR\\PSSharedarea\\Bridgwater\\Miscellaneous\\OL_Backup.xlsx";
 
-        //At Home
+    //At Home
         /*public static final String ORIGINAL_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1.xlsx";
         public static final String WORK_TO_BE_DONE_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList1.xlsx";
         public static final String COPIED_FILE_NAME = "C:\\Users\\msola\\OneDrive\\Desktop\\OrderList_Copy_copy.xlsx";*/
 
-        public static final String CASCADE_UPLOAD_FILE_NAME = "upload.csv";
-        public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
+    public static final String CASCADE_UPLOAD_FILE_NAME = "upload.csv";
+    public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
 
 
 
 
-        public static final String SIGMA_ORDERING_TEXT_IN_NOTES = "s";
+    public static final String SIGMA_ORDERING_TEXT_IN_NOTES = "s";
 
-        //
-        static String currentDir = System.getProperty("user.dir");
-       // System.out.println("Current dir using System:" + currentDir);
-        public static final String CASCADE_UPLOAD_FILE_BASE_LOCATION = currentDir;
-
+    //
+    static String currentDir = System.getProperty("user.dir");
+    // System.out.println("Current dir using System:" + currentDir);
+    public static final String CASCADE_UPLOAD_FILE_BASE_LOCATION = currentDir;
 
 
         public static void main(String[] args) throws Exception{
@@ -67,7 +65,13 @@ public class Server {
                 //updating the file with the results
                 FileInputStream file = new FileInputStream(WORK_TO_BE_DONE_FILE_NAME);
                 Workbook workbook = new XSSFWorkbook(file);
-                Sheet my_sheet = workbook.getSheetAt(0);
+                Sheet sheet0 = workbook.getSheetAt(0);
+
+                FileInputStream copiedFile = new FileInputStream(COPIED_FILE_NAME);
+                Workbook bakupFileWorkbook = new XSSFWorkbook(copiedFile);
+                Sheet copiedSheet = bakupFileWorkbook.getSheetAt(0);
+
+
 
                 // normalFont
                 CellStyle normalFontStyle = workbook.createCellStyle();
@@ -132,7 +136,9 @@ public class Server {
 
 
 
-                ExecutorService executor = Executors.newFixedThreadPool(4);
+
+
+            ExecutorService executor = Executors.newFixedThreadPool(5);
 
 
                 //Filter aahResults and pass it to Aah service to fetch the aah results
@@ -179,6 +185,8 @@ public class Server {
                 Callable<Map<OrderListKey, Set<ActualSupplierData>>> sigmaWorker = new SigmaProcessService(sigmaPipCodes);
                 Future<Map<OrderListKey, Set<ActualSupplierData>>>  sigmaFuture = executor.submit(sigmaWorker);
 
+                Callable<Map<OrderListKey, Set<ActualSupplierData>>> bnsWorker = new BNSProcessService(cascadeResults.keySet());
+                Future<Map<OrderListKey, Set<ActualSupplierData>>>  bnsFuture = executor.submit(bnsWorker);
 
                 executor.shutdown();
 
@@ -186,6 +194,7 @@ public class Server {
                 Map<OrderListKey, Set<ActualSupplierData>> tridentProcessedResults = tridentFuture.get();
                 Map<OrderListKey, Set<ActualSupplierData>> bestwayProcessedResults = bestwayFuture.get();
                 Map<OrderListKey, Set<ActualSupplierData>> sigmaProcessedResults = sigmaFuture.get();
+                Map<OrderListKey, Set<ActualSupplierData>> bnsProcessedResults = bnsFuture.get();
 
 
 
@@ -199,6 +208,13 @@ public class Server {
 
                         // add sigma processed results
                         entry.getValue().addAll(sigmaProcessedResults.get(key));
+
+                        //add Bns Processed results
+                        Set<ActualSupplierData> actualSupplierData = bnsProcessedResults.get(key);
+                        if(actualSupplierData!=null){
+                            entry.getValue().addAll(bnsProcessedResults.get(key));
+                        }
+
                 }
 
                 System.out.println(cascadeResults);
@@ -206,41 +222,13 @@ public class Server {
 
 
 
-                /*Row row0 = my_sheet.createRow(0);
-                Cell cell0_1 = row0.createCell(ORDER_LIST_DESC_CELL); cell0_1.setCellValue("OrderList Desc"); cell0_1.setCellStyle(normalFontStyle);
-                Cell cell0_2 = row0.createCell(CASCADE_DESC_CELL); cell0_2.setCellValue("cascade Desc"); cell0_2.setCellStyle(normalFontStyle);
-                Cell cell0_3 = row0.createCell(QUANTITY_CELL); cell0_3.setCellValue("Quantity"); cell0_3.setCellStyle(normalFontStyle);
-                Cell cell0_4 = row0.createCell(FROM_CELL); cell0_4.setCellValue("From"); cell0_4.setCellStyle(normalFontStyle);
-                Cell cell0_5 = row0.createCell(NOTES_CELL); cell0_5.setCellValue("Notes"); cell0_5.setCellStyle(normalFontStyle);
-                Cell cell0_6 = row0.createCell(TARRIF_CELL); cell0_6.setCellValue("Tariff"); cell0_6.setCellStyle(normalFontStyle);
-                Cell cell0_7 = row0.createCell(TARIFF_AFTER_DEDUCTION_CELL); cell0_7.setCellValue("DTnet"); cell0_6.setCellStyle(normalFontStyle);
-                Cell cell0_8 = row0.createCell(CONCESSION_CELL); cell0_8.setCellValue("Concession"); cell0_8.setCellStyle(normalFontStyle);
-                Cell cell0_9 = row0.createCell(ORDER_LIST_PIP_CODE_CELL); cell0_9.setCellValue("Order list pip"); cell0_9.setCellStyle(normalFontStyle);
-                Cell cell0_10 = row0.createCell(AAH_PRICE_CELL); cell0_10.setCellValue("AAH "); cell0_10.setCellStyle(normalFontStyle);
-                Cell cell0_11 = row0.createCell(AAH_PIP_CELL); cell0_11.setCellValue("AAH Pip"); cell0_11.setCellStyle(normalFontStyle);
-                Cell cell0_12 = row0.createCell(BESTWAY_PRICE_CELL); cell0_12.setCellValue("Bestway"); cell0_12.setCellStyle(normalFontStyle);
-                Cell cell0_13 = row0.createCell(BESTWAY_PIP_CELL); cell0_13.setCellValue("Bestway pip"); cell0_13.setCellStyle(normalFontStyle);
-                Cell cell0_14 = row0.createCell(BNS_PRICE_CELL); cell0_14.setCellValue("BNS"); cell0_14.setCellStyle(normalFontStyle);
-                Cell cell0_15 = row0.createCell(BNS_PIP_CELL); cell0_15.setCellValue("BNS Pip"); cell0_15.setCellStyle(normalFontStyle);
-                Cell cell0_16 = row0.createCell(LEXON_PRICE_CELL); cell0_16.setCellValue("Lexon"); cell0_16.setCellStyle(normalFontStyle);
-                Cell cell0_17 = row0.createCell(LEXON_PIP_CELL); cell0_17.setCellValue("Lexon Pip"); cell0_17.setCellStyle(normalFontStyle);
-                Cell cell0_18 = row0.createCell(OTC_PRICE_CELL); cell0_18.setCellValue("OTC"); cell0_18.setCellStyle(normalFontStyle);
-                Cell cell0_19 = row0.createCell(OTC_PIP_CELL); cell0_19.setCellValue("OTC Pip"); cell0_19.setCellStyle(normalFontStyle);
-                Cell cell0_20 = row0.createCell(SIGMA_PRICE_CELL); cell0_20.setCellValue("Sigma"); cell0_20.setCellStyle(normalFontStyle);
-                Cell cell0_21 = row0.createCell(SIGMA_PIP_CELL); cell0_21.setCellValue("Sigma Pip"); cell0_21.setCellStyle(normalFontStyle);
-                Cell cell0_22 = row0.createCell(TRIDENT_PRICE_CELL); cell0_22.setCellValue("Trident Pip"); cell0_22.setCellStyle(normalFontStyle);
-                Cell cell0_23 = row0.createCell(TRIDENT_PIP_CELL); cell0_23.setCellValue("Trident Pip"); cell0_23.setCellStyle(normalFontStyle);
-                Cell cell0_24 = row0.createCell(ALLIANCE_PRICE_CELL); cell0_24.setCellValue("Alliance Price"); cell0_24.setCellStyle(normalFontStyle);
-                Cell cell0_25 = row0.createCell(ALLIANCE_PIP_CELL); cell0_25.setCellValue("Alliance Pip"); cell0_25.setCellStyle(normalFontStyle);
-                Cell cell0_26 = row0.createCell(LOOKED_UP_AT); cell0_26.setCellValue("Lookedup At"); cell0_26.setCellStyle(normalFontStyle);*/
-
 
                 // iterate through the map to find out which one is least and add to the excel
                 for (Map.Entry<OrderListKey, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
                         OrderListKey key = entry.getKey();
                         Set<ActualSupplierData> value = entry.getValue();
                         if(value.isEmpty()){
-                                continue;
+                            continue;
                         }
                         ActualSupplierData cheaperAahData = value.stream()
                                 .filter(v-> SUPPLIER_AAH.equalsIgnoreCase(v.getSupplier()))
@@ -322,16 +310,17 @@ public class Server {
 
 
 
-                        Row row = my_sheet.getRow(key.getSno());
+                        Row sheet0Row = sheet0.getRow(key.getSno());
+                        Row copiedFileRow = copiedSheet.getRow(key.getSno());
 
 
                         //Order list desc
-                        Cell cell0 = row.createCell(ORDER_LIST_DESC_CELL);
+                        /*Cell cell0 = sheet0Row.createCell(ORDER_LIST_DESC_CELL);
                         cell0.setCellValue(key.getOrderListDesc());
-                        cell0.setCellStyle(normalFontStyle);
+                        cell0.setCellStyle(normalFontStyle);*/
 
                         //Cascade Desc
-                        Cell cell1 = row.createCell(CASCADE_DESC_CELL);
+                       Cell cell1 = sheet0Row.createCell(CASCADE_DESC_CELL);
                         if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getTariff()!=null){
                                 cell1.setCellValue(cascadeDataForProductDesc.getDescription());
                         }else{
@@ -359,7 +348,7 @@ public class Server {
                         cell4.setCellStyle(normalFontStyle);*/
 
                         //Tariff
-                        Cell cell5 = row.createCell(TARRIF_CELL);
+                        Cell cell5 = sheet0Row.createCell(TARRIF_CELL);
                         if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getTariff()!=null){
                                 cell5.setCellValue(cascadeDataForProductDesc.getTariff());
                         }else{
@@ -368,7 +357,7 @@ public class Server {
                         cell5.setCellStyle(normalFontStyle);
 
                         //TariffAfterDeduction
-                        Cell cell6 = row.createCell(TARIFF_AFTER_DEDUCTION_CELL);
+                        Cell cell6 = sheet0Row.createCell(TARIFF_AFTER_DEDUCTION_CELL);
                         if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getTariffAfterDeduction()!=null){
                                 cell6.setCellValue(cascadeDataForProductDesc.getTariffAfterDeduction());
                         }else{
@@ -377,7 +366,7 @@ public class Server {
                         cell6.setCellStyle(normalFontStyle);
 
                         //concession
-                        Cell cell7 = row.createCell(CONCESSION_CELL);
+                        Cell cell7 = sheet0Row.createCell(CONCESSION_CELL);
                         if(cascadeDataForProductDesc!=null && cascadeDataForProductDesc.getConcession()!=null){
                                 cell7.setCellValue(cascadeDataForProductDesc.getConcession());
                         }else {
@@ -385,13 +374,13 @@ public class Server {
                         }
                         cell7.setCellStyle(normalFontStyle);
                         //ordercode
-                        Cell cell8 = row.createCell(ORDER_LIST_PIP_CODE_CELL);
+                        Cell cell8 = sheet0Row.createCell(ORDER_LIST_PIP_CODE_CELL);
                         cell8.setCellValue(key.getOrderListPipCode());
                         cell8.setCellStyle(normalFontStyle);
 
 
                         //AAH price
-                        Cell cell9 = row.createCell(AAH_PRICE_CELL);
+                        Cell cell9 = sheet0Row.createCell(AAH_PRICE_CELL);
                         cell9.getCellStyle().setDataFormat(workbook.createDataFormat().getFormat("0.00"));
                         //If both are null, ie. its not stocked
                         if(null != cheaperAahData){
@@ -415,10 +404,11 @@ public class Server {
                                 }
                         }else{
                                 //cell9.setCellValue("NS");
+                            cell9.setCellValue(copiedFileRow.getCell(AAH_PRICE_CELL).getNumericCellValue());
                         }
 
                         //AAH pip
-                        Cell cell10 = row.createCell(AAH_PIP_CELL);
+                        Cell cell10 = sheet0Row.createCell(AAH_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperAahData  ){
                                 //get the cheaper AAH's pip
@@ -428,7 +418,7 @@ public class Server {
                         }
 
                         //Bestway
-                        Cell cell11 = row.createCell(BESTWAY_PRICE_CELL);
+                        Cell cell11 = sheet0Row.createCell(BESTWAY_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBestwayData && null != cheaperPrice ){
                                 //if cheaper is bestway, and available then yellow back with green -- greenBoldFontStyle
@@ -451,10 +441,11 @@ public class Server {
                                 }
                         }else{
                                 //cell11.setCellValue("NS");
+                            cell11.setCellValue(copiedFileRow.getCell(BESTWAY_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Bestway pip
-                        Cell cell12 = row.createCell(BESTWAY_PIP_CELL);
+                        Cell cell12 = sheet0Row.createCell(BESTWAY_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBestwayData  ){
                                 //get the cheaper AAH's pip
@@ -464,17 +455,25 @@ public class Server {
                         }
 
                         //BNS
-                        Cell cell13 = row.createCell(BNS_PRICE_CELL);
+                        Cell cell13 = sheet0Row.createCell(BNS_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBnsData && null != cheaperPrice ){
                                 //if cheaper is bns, and available then yellow back with green -- greenBoldFontStyle
                                 //if bns stock available then green, if stock not available then red
-                                if(null != cheaperBnsData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBnsData.getStatus())
+                            if(null != cheaperBnsData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBnsData.getStatus())
                                         && null != cheaperBnsData.getPrice()
                                         && null != cheaperPrice.getPrice()
                                         && cheaperPrice.getPrice().compareTo(cheaperBnsData.getPrice()) == 0){
+
+                                    if(key.getBnsPhonePrice().compareTo(cheaperBnsData.getPrice()) >0){
                                         cell13.setCellValue(cheaperBnsData.getPrice());
                                         cell13.setCellStyle(greenBoldFontStyle);
+                                    }else{
+                                        cell13.setCellValue(key.getBnsPhonePrice());
+                                        //cell13.setCellStyle(greenBoldFontStyle);
+                                    }
+
+
                                 }else{
                                         if(null != cheaperBnsData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBnsData.getStatus())){
                                                 cell13.setCellValue(cheaperBnsData.getPrice());
@@ -487,10 +486,11 @@ public class Server {
                                 }
                         }else{
                                 //cell13.setCellValue("NS");
+                            cell13.setCellValue(copiedFileRow.getCell(BNS_PRICE_CELL).getNumericCellValue());
                         }
 
                         //BNS pip
-                        Cell cell14 = row.createCell(BNS_PIP_CELL);
+                        Cell cell14 = sheet0Row.createCell(BNS_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperBnsData  ){
                                 //get the cheaper BNS's pip
@@ -500,7 +500,7 @@ public class Server {
                         }
 
                         //Lexon
-                        Cell cell15 = row.createCell(LEXON_PRICE_CELL);
+                        Cell cell15 = sheet0Row.createCell(LEXON_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperLexonData && null != cheaperPrice ){
                                 //if cheaper is Lexon, and available then yellow back with green -- greenBoldFontStyle
@@ -523,10 +523,11 @@ public class Server {
                                 }
                         }else{
                                 //cell15.setCellValue("NS");
+                            cell15.setCellValue(copiedFileRow.getCell(LEXON_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Lexon pip
-                        Cell cell16 = row.createCell(LEXON_PIP_CELL);
+                        Cell cell16 = sheet0Row.createCell(LEXON_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperLexonData  ){
                                 //get the cheaper BNS's pip
@@ -541,12 +542,12 @@ public class Server {
                         cell17.setCellStyle(normalFontStyle);*/
 
                         //OTC PIP
-                        Cell cell18 = row.createCell(OTC_PIP_CELL);
+                        Cell cell18 = sheet0Row.createCell(OTC_PIP_CELL);
                         cell18.setCellValue("");
                         cell18.setCellStyle(normalFontStyle);
 
                         //Sigma
-                        Cell cell19 = row.createCell(SIGMA_PRICE_CELL);
+                        Cell cell19 = sheet0Row.createCell(SIGMA_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperSigmaData && null != cheaperPrice ){
                                 //if cheaper is Sigma, and available then yellow back with green -- greenBoldFontStyle
@@ -569,10 +570,11 @@ public class Server {
                                 }
                         }else{
                                 //cell19.setCellValue("NS");
+                            cell19.setCellValue(copiedFileRow.getCell(SIGMA_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Sigma pip
-                        Cell cell20 = row.createCell(SIGMA_PIP_CELL);
+                        Cell cell20 = sheet0Row.createCell(SIGMA_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperSigmaData  ){
                                 //get the cheaper Sigma's pip
@@ -582,7 +584,7 @@ public class Server {
                         }
 
                         //Trident
-                        Cell cell21 = row.createCell(TRIDENT_PRICE_CELL);
+                        Cell cell21 = sheet0Row.createCell(TRIDENT_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperTridentData && null != cheaperPrice ){
                                 //if cheaper is Trident, and available then yellow back with green -- greenBoldFontStyle
@@ -605,10 +607,11 @@ public class Server {
                                 }
                         }else{
                                 //cell21.setCellValue("NS");
+                            cell21.setCellValue(copiedFileRow.getCell(TRIDENT_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Trident pip
-                        Cell cell22 = row.createCell(TRIDENT_PIP_CELL);
+                        Cell cell22 = sheet0Row.createCell(TRIDENT_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperTridentData  ){
                                 //get the cheaper Trident's pip
@@ -618,7 +621,7 @@ public class Server {
                         }
 
                         //Alliance
-                        Cell cell23 = row.createCell(ALLIANCE_PRICE_CELL);
+                        Cell cell23 = sheet0Row.createCell(ALLIANCE_PRICE_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperAllianceData && null != cheaperPrice ){
                                 //if cheaper is Alliance, and available then yellow back with green -- greenBoldFontStyle
@@ -641,10 +644,11 @@ public class Server {
                                 }
                         }else{
                                 //cell23.setCellValue("NS");
+                            cell23.setCellValue(copiedFileRow.getCell(ALLIANCE_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Alliance pip
-                        Cell cell24 = row.createCell(ALLIANCE_PIP_CELL);
+                        Cell cell24 = sheet0Row.createCell(ALLIANCE_PIP_CELL);
                         //If both are null, ie. its not stocked
                         if(null != cheaperAllianceData  ){
                                 //get the cheaper Trident's pip
@@ -660,39 +664,39 @@ public class Server {
         */
 
                         //AAH Cascade price
-                        Cell cell26 = row.createCell(AAH_CASCADE_PRICE_CELL);
+                        Cell cell26 = sheet0Row.createCell(AAH_CASCADE_PRICE_CELL);
                         if(null !=cheaperAahData && null != cheaperAahData.getCascadePrice()){
                                 cell26.setCellValue(cheaperAahData.getCascadePrice());
                                 /*cell26.setCellStyle(accountingFontStyle);*/
                         }
 
                         //AAH Cascade status
-                        Cell cell27 = row.createCell(AAH_CASCADE_STATUS_CELL);
+                        Cell cell27 = sheet0Row.createCell(AAH_CASCADE_STATUS_CELL);
                         if(null !=cheaperAahData && null != cheaperAahData.getCascadeStatus()){
                                 cell27.setCellValue(cheaperAahData.getCascadeStatus());
                         }
 
                         //AAH Cascade PIP
-                        Cell cell28 = row.createCell(AAH_CASCADE_PIP_CELL);
+                        Cell cell28 = sheet0Row.createCell(AAH_CASCADE_PIP_CELL);
                         if(null !=cheaperAahData && null != cheaperAahData.getCascadeCode()){
                                 cell28.setCellValue(cheaperAahData.getCascadeCode());
                         }
 
                         //
                         //Bestway Cascade price
-                        Cell cell29 = row.createCell(BESTWAY_CASCADE_PRICE_CELL);
+                        Cell cell29 = sheet0Row.createCell(BESTWAY_CASCADE_PRICE_CELL);
                         if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadePrice()){
                                 cell29.setCellValue(cheaperBestwayData.getCascadePrice());
                         }
 
                         //Bestway Cascade status
-                        Cell cell30 = row.createCell(BESTWAY_CASCADE_STATUS_CELL);
+                        Cell cell30 = sheet0Row.createCell(BESTWAY_CASCADE_STATUS_CELL);
                         if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadeStatus()){
                                 cell30.setCellValue(cheaperBestwayData.getCascadeStatus());
                         }
 
                         //Bestway Cascade PIP
-                        Cell cell31 = row.createCell(BESTWAY_CASCADE_PIP_CELL);
+                        Cell cell31 = sheet0Row.createCell(BESTWAY_CASCADE_PIP_CELL);
                         if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadeCode()){
                                 cell31.setCellValue(cheaperBestwayData.getCascadeCode());
                         }
@@ -716,24 +720,24 @@ public class Server {
                         }*/
 
                         //Trident Cascade price
-                        Cell cell35 = row.createCell(TRIDENT_CASCADE_PRICE_CELL);
+                        Cell cell35 = sheet0Row.createCell(TRIDENT_CASCADE_PRICE_CELL);
                         if(null !=cheaperTridentData && null != cheaperTridentData.getCascadePrice()){
                                 cell35.setCellValue(cheaperTridentData.getCascadePrice());
                         }
 
                         //Trident Cascade status
-                        Cell cell36 = row.createCell(TRIDENT_CASCADE_STATUS_CELL);
+                        Cell cell36 = sheet0Row.createCell(TRIDENT_CASCADE_STATUS_CELL);
                         if(null !=cheaperTridentData && null != cheaperTridentData.getCascadeStatus()){
                                 cell36.setCellValue(cheaperTridentData.getCascadeStatus());
                         }
 
                         //Trident Cascade PIP
-                        Cell cell37 = row.createCell(TRIDENT_CASCADE_PIP_CELL);
+                        Cell cell37 = sheet0Row.createCell(TRIDENT_CASCADE_PIP_CELL);
                         if(null !=cheaperTridentData && null != cheaperTridentData.getCascadeCode()){
                                 cell37.setCellValue(cheaperTridentData.getCascadeCode());
                         }
 
-                        Cell cell25 = row.createCell(LOOKED_UP_AT);
+                        Cell cell25 = sheet0Row.createCell(LOOKED_UP_AT);
                         LocalDateTime now = LocalDateTime.now();
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm");
                         String formattedDateTime = now.format(formatter);
@@ -743,10 +747,10 @@ public class Server {
 
                 }
 
-                makeSound();
-                Scanner input = new Scanner(System.in);
-                System.out.print("Can you please check if the order list file is open on any other clients, if yes can you please save and close that file and press enter to continue");
-                String nextLine = input.nextLine();
+            makeSound();
+            Scanner input = new Scanner(System.in);
+            System.out.print("Can you please check if the order list file is open on any other clients, if yes can you please save and close that file and press enter to continue");
+            String nextLine = input.nextLine();
 
                 /* Write changes to the workbook */
                 FileOutputStream out = new FileOutputStream(WORK_TO_BE_DONE_FILE_NAME);
@@ -756,30 +760,29 @@ public class Server {
                 Long endTime = System.currentTimeMillis();
                 System.out.println("Total time taken ======>"+ (endTime-startTime)/1000 +" Seconds");
 
-
-
-
         }
 
-        public static void makeSound() throws LineUnavailableException {
-                System.out.println("Make sound");
-                byte[] buf = new byte[2];
-                int frequency = 44100; //44100 sample points per 1 second
-                AudioFormat af = new AudioFormat((float) frequency, 16, 1, true, false);
-                SourceDataLine sdl = AudioSystem.getSourceDataLine(af);
-                sdl.open();
-                sdl.start();
-                int durationMs = 5000;
-                int numberOfTimesFullSinFuncPerSec = 441; //number of times in 1sec sin function repeats
-                for (int i = 0; i < durationMs * (float) 44100 / 1000; i++) { //1000 ms in 1 second
-                        float numberOfSamplesToRepresentFullSin= (float) frequency / numberOfTimesFullSinFuncPerSec;
-                        double angle = i / (numberOfSamplesToRepresentFullSin/ 2.0) * Math.PI;  // /divide with 2 since sin goes 0PI to 2PI
-                        short a = (short) (Math.sin(angle) * 32767);  //32767 - max value for sample to take (-32767 to 32767)
-                        buf[0] = (byte) (a & 0xFF); //write 8bits ________WWWWWWWW out of 16
-                        buf[1] = (byte) (a >> 8); //write 8bits WWWWWWWW________ out of 16
-                        sdl.write(buf, 0, 2);
-                }
-                sdl.drain();
-                sdl.stop();
+
+
+    public static void makeSound() throws LineUnavailableException {
+        System.out.println("Make sound");
+        byte[] buf = new byte[2];
+        int frequency = 44100; //44100 sample points per 1 second
+        AudioFormat af = new AudioFormat((float) frequency, 16, 1, true, false);
+        SourceDataLine sdl = AudioSystem.getSourceDataLine(af);
+        sdl.open();
+        sdl.start();
+        int durationMs = 5000;
+        int numberOfTimesFullSinFuncPerSec = 441; //number of times in 1sec sin function repeats
+        for (int i = 0; i < durationMs * (float) 44100 / 1000; i++) { //1000 ms in 1 second
+            float numberOfSamplesToRepresentFullSin= (float) frequency / numberOfTimesFullSinFuncPerSec;
+            double angle = i / (numberOfSamplesToRepresentFullSin/ 2.0) * Math.PI;  // /divide with 2 since sin goes 0PI to 2PI
+            short a = (short) (Math.sin(angle) * 32767);  //32767 - max value for sample to take (-32767 to 32767)
+            buf[0] = (byte) (a & 0xFF); //write 8bits ________WWWWWWWW out of 16
+            buf[1] = (byte) (a >> 8); //write 8bits WWWWWWWW________ out of 16
+            sdl.write(buf, 0, 2);
         }
+        sdl.drain();
+        sdl.stop();
+    }
 }
