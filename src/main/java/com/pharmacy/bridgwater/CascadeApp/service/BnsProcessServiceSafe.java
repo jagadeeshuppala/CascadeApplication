@@ -4,6 +4,7 @@ package com.pharmacy.bridgwater.CascadeApp.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pharmacy.bridgwater.CascadeApp.model.ActualSupplierData;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -12,13 +13,13 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.util.*;
 
 
-public class BnsProcessService {
+public class BnsProcessServiceSafe {
 
     public static void main(String args[]) throws InterruptedException, JsonProcessingException {
         Long startTime = System.currentTimeMillis();
         Map<String,Set<ActualSupplierData>> cascadeDataForTrident = new LinkedHashMap<>();
 
-        BnsProcessService process = new BnsProcessService();
+        BnsProcessServiceSafe process = new BnsProcessServiceSafe();
         /*CascadeService cascade = new CascadeService();
         Map<String, List<CascadeSupplier>> cascadeResultsMap = cascade.getCascadeResults();
         for (Map.Entry<String, List<CascadeSupplier>> entry : cascadeResultsMap.entrySet()) {
@@ -31,11 +32,29 @@ public class BnsProcessService {
             cascadeDataForTrident.put(key, bnsCascadeSet);
         }*/
 
+        /*1367C
+        0421E
+        0359B
+        0356A
+        4357A
+        4357B*/
+
+
         cascadeDataForTrident.put("BD Micro-Fine Ultra hypodermic insulin needles for pre-filled / reusable pen injectors screw on 4mm/32gauge Pk: 100",
-                new HashSet<>(Arrays.asList(ActualSupplierData.builder().code("7943103").price(Double.valueOf("4.36")).status("Available").build()
-                        //,TridentData.builder().code("6177560").cascadePrice(Double.valueOf("4.64")).cascadeStatus("Available").build()
-                )
-                ));
+                new HashSet<>(Arrays.asList(
+                        ActualSupplierData.builder().code("1367C").price(Double.valueOf("4.36")).status("Available").build()
+                ))
+
+
+        );
+
+        cascadeDataForTrident.put("BD Micro-Fine Ultra hypodermic insulin needles for pre-filled / reusable pen injectors screw on 4mm/32gauge Pk: 1002",
+                new HashSet<>(Arrays.asList(
+                        ActualSupplierData.builder().code("0421E").price(Double.valueOf("4.36")).status("Available").build()
+                ))
+
+
+        );
 
        /* cascadeDataForTrident.put("Carbimazole 5mg tablets Pk: 100",
                 new HashSet<>(Arrays.asList(TridentData.builder().code("1182302").cascadePrice(Double.valueOf("2.85")).cascadeStatus("Available").build()
@@ -88,31 +107,14 @@ public class BnsProcessService {
                 Thread.sleep(2000);
                 // retrieved product list click
                 try{
-                    /*driver.findElement(By.xpath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/span[1]/div[2]/div[2]/ul[1]/li[1]")).click();
-                    Thread.sleep(3000);*/
-                    //String descriptionFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/h4[1]")).getText();
-                    String descriptionFromWebsite = driver.findElement(By.xpath("/html/body/div[1]/div[2]/span/div/div/div[2]/div[6]/div[2]/div[2]/span/div/div/div/div[2]/div/div[1]/span/p[1]")).getText();
-                    String priceFromWebsite = null;
+                    String descriptionFromWebsite = driver.findElement(By.xpath("/html/body/ul/li[3]/a/table/tbody/tr/td[2]")).getText();
+                    String priceFromWebsite = driver.findElement(By.xpath("/html/body/ul/li[3]/a/table/tbody/tr/td[4]")).getText();
+                    String priceWithoutPoundSign = !StringUtils.isEmpty(priceFromWebsite)?priceFromWebsite.replaceAll("£",""):"";
 
-                    try{
-                       // priceFromWebsite = driver.findElement(By.xpath("//html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[4]/div[1]/div[1]/div[1]/span[1]")).getText();
-                        priceFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[6]/div[2]/div[2]/span[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[3]/span[1]/div[1]/div[1]/span[1]")).getText();
-                    }catch (Exception e){
-                        System.out.println("priceFromWebsite is failing at div 4");
-                        try{
-                            priceFromWebsite = driver.findElement(By.xpath("//html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/div[5]/div[1]/div[1]/div[1]/span[1]")).getText();
-                        }catch (Exception exception){
-                            System.out.println("priceFromWebsite is failing at div 5");
-                        }
-                    }
-
-                    //String availablityFromWebsite = driver.findElement(By.xpath("//div[@class='avail-col-text avail-col-width']")).getText();
-                    String availablityFromWebsite = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/span[1]/div[1]/div[1]/div[2]/div[6]/div[2]/div[2]/span[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[2]")).getText();
-                    System.out.println("PipCode:"+pipCode+"; descFromWebsite:"+descriptionFromWebsite+ "; priceFromWebsite:"+ priceFromWebsite+ "; availability:"+availablityFromWebsite);
-                    /*bnsData.setSupplierPrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
-                    bnsData.setDefinitePrice(!StringUtils.isEmpty(priceFromWebsite) ?Double.valueOf(priceFromWebsite.replace("£","")):null);
-                    bnsData.setSupplierStatus(!StringUtils.isEmpty(availablityFromWebsite)?stockAvailability(availablityFromWebsite):null);
-                    bnsData.setDefiniteStatus(!StringUtils.isEmpty(availablityFromWebsite)?stockAvailability(availablityFromWebsite):null);*/
+                    String availablityFromWebsite = driver.findElement(By.xpath("/html/body/ul/li[3]/a/table/tbody/tr/td[3]/i")).getAttribute("class");
+                    String avialabityToText = !StringUtils.isEmpty(availablityFromWebsite)?stockAvailability(availablityFromWebsite):"";
+                    driver.findElement(By.xpath("/html/body/ul/li[3]/a/table/tbody/tr/td[3]/i"));
+                    System.out.println("PipCode:"+pipCode+"; descFromWebsite:"+descriptionFromWebsite+ "; priceFromWebsite:"+ priceWithoutPoundSign+ "; availability:"+avialabityToText);
 
                 }catch (Exception e){
                     //e.printStackTrace();
@@ -123,13 +125,8 @@ public class BnsProcessService {
         }
 
         try{
-            /*Actions actions = new Actions(driver);
-            WebElement element = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[5]/div[1]/div[1]/div[1]/div[3]/div[1]/div[1]/lightning-icon[1]/span[1]/lightning-primitive-icon[1]/*[name()='svg'][1]"));
-            actions.moveToElement(element).click().perform();
-            element = driver.findElement(By.xpath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[5]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/a[11]"));
-            actions.moveToElement(element).click().perform();*/
-            driver.findElement(By.xpath("/html[1]/body[1]/div[1]/strong[1]/strong[1]/div[1]/div[1]/div[1]/div[1]/div[1]/a[1]/i[1]")).click();
-            driver.findElement(By.xpath("/html[1]/body[1]/div[11]/div[3]/div[1]/button[1]/i[1]")).click();
+
+            driver.findElement(By.xpath("/html[1]/body[1]/div[1]/strong[1]/strong[1]/div[1]/div[1]/div[1]/div[1]/div[1]/a[1]/span[1]")).click();
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("Falied to click on the logout");
@@ -143,9 +140,9 @@ public class BnsProcessService {
 
     private String stockAvailability(String availability){
         switch (availability){
-            case "Out of stock":
+            case "fa fa-circle icon_red":
                 return "Not Available";
-            case "In stock":
+            case "fa fa-circle icon_green":
                 return "Available";
             default:
                 return null;

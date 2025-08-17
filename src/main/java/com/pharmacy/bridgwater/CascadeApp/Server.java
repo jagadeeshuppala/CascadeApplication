@@ -8,6 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -42,10 +46,7 @@ public class Server {
         public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
 
 
-        public static final int ORDER_LIST_DESC = 0;
-        public static final int ORDER_LIST_PIP = 1;
-        public static final int ORDER_LIST_QTY = 3;
-        public static final int ORDER_LIST_FROM = 4;
+
 
         public static final String SIGMA_ORDERING_TEXT_IN_NOTES = "s";
 
@@ -742,6 +743,11 @@ public class Server {
 
                 }
 
+                makeSound();
+                Scanner input = new Scanner(System.in);
+                System.out.print("Can you please check if the order list file is open on any other clients, if yes can you please save and close that file and press enter to continue");
+                String nextLine = input.nextLine();
+
                 /* Write changes to the workbook */
                 FileOutputStream out = new FileOutputStream(WORK_TO_BE_DONE_FILE_NAME);
                 workbook.write(out);
@@ -750,5 +756,30 @@ public class Server {
                 Long endTime = System.currentTimeMillis();
                 System.out.println("Total time taken ======>"+ (endTime-startTime)/1000 +" Seconds");
 
+
+
+
+        }
+
+        public static void makeSound() throws LineUnavailableException {
+                System.out.println("Make sound");
+                byte[] buf = new byte[2];
+                int frequency = 44100; //44100 sample points per 1 second
+                AudioFormat af = new AudioFormat((float) frequency, 16, 1, true, false);
+                SourceDataLine sdl = AudioSystem.getSourceDataLine(af);
+                sdl.open();
+                sdl.start();
+                int durationMs = 5000;
+                int numberOfTimesFullSinFuncPerSec = 441; //number of times in 1sec sin function repeats
+                for (int i = 0; i < durationMs * (float) 44100 / 1000; i++) { //1000 ms in 1 second
+                        float numberOfSamplesToRepresentFullSin= (float) frequency / numberOfTimesFullSinFuncPerSec;
+                        double angle = i / (numberOfSamplesToRepresentFullSin/ 2.0) * Math.PI;  // /divide with 2 since sin goes 0PI to 2PI
+                        short a = (short) (Math.sin(angle) * 32767);  //32767 - max value for sample to take (-32767 to 32767)
+                        buf[0] = (byte) (a & 0xFF); //write 8bits ________WWWWWWWW out of 16
+                        buf[1] = (byte) (a >> 8); //write 8bits WWWWWWWW________ out of 16
+                        sdl.write(buf, 0, 2);
+                }
+                sdl.drain();
+                sdl.stop();
         }
 }

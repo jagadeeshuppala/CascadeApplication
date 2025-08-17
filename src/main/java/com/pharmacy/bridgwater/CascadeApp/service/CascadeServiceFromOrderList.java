@@ -15,12 +15,18 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.pharmacy.bridgwater.CascadeApp.Server.*;
+import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 
 
 public class CascadeServiceFromOrderList {
@@ -49,12 +55,19 @@ public class CascadeServiceFromOrderList {
         List<Integer> orderListSnoMapping = new LinkedList<>();
         List<String> orderListPipCodesMapping = new LinkedList<>();
         List<String> orderListDescMapping = new LinkedList<>();
+        List<String> bnsPipOrderListMapping = new LinkedList<>();
+        List<Double> bnsPhonePriceOrderListMapping = new LinkedList<>();
 
         Writer cascadeUploadFile = new FileWriter(CASCADE_UPLOAD_FILE_NAME);
         Writer mappingFile = new FileWriter(CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO);
 
         try{
             System.out.println("lastRowNumber::"+sheet.getLastRowNum());
+
+            DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("dd/MM HH:mm")
+                    .parseDefaulting(ChronoField.YEAR, LocalDate.now().getYear())
+                    .toFormatter();
+
 
             for (int i = 1; i <= sheet.getLastRowNum() && sheet.getRow(i) != null  ; i++) {
                 if (sheet.getRow(i).getCell(ORDER_LIST_DESC) != null
@@ -70,14 +83,39 @@ public class CascadeServiceFromOrderList {
                         && !sheet.getRow(i).getCell(ORDER_LIST_QTY).toString().trim().equals("")
                         &&(sheet.getRow(i).getCell(ORDER_LIST_FROM).getCellType()== CellType.BLANK || sheet.getRow(i).getCell(ORDER_LIST_FROM).toString().trim().equals(""))
 
+                        &&sheet.getRow(i).getCell(LOOKED_UP_AT).getCellType() != CellType.BLANK
+                        && !sheet.getRow(i).getCell(LOOKED_UP_AT).toString().trim().equals("")
+                        && LocalDate.parse(sheet.getRow(i).getCell(LOOKED_UP_AT).toString(), formatter).isBefore(LocalDate.now())
                 ) {
                     try{
 
+
                         String content = Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_PIP))).intValue()+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY))).intValue() + "\r\n";
-                        String mappingFileContent = i+","+sheet.getRow(i).getCell(ORDER_LIST_DESC)+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_PIP))).intValue()+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY))).intValue() + "\r\n";
+                        String mappingFileContent = null;
+                        if(sheet.getRow(i).getCell(BNS_PIP_ORDER_LIST).getCellType() != CellType.BLANK
+                                && !sheet.getRow(i).getCell(BNS_PIP_ORDER_LIST).toString().trim().equals("")){
+                            mappingFileContent= i+","+sheet.getRow(i).getCell(ORDER_LIST_DESC)+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_PIP))).intValue()
+                                    +","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY))).intValue()+","+sheet.getRow(i).getCell(BNS_PIP_ORDER_LIST) +",";
+                        }else{
+                            mappingFileContent = i+","+sheet.getRow(i).getCell(ORDER_LIST_DESC)+","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_PIP))).intValue()
+                                    +","+Double.valueOf(String.valueOf(sheet.getRow(i).getCell(ORDER_LIST_QTY))).intValue()+","+BNS_PIP_BLANK +",";
+                        }
+                        String bnsPhonePrice ="100000" + "\r\n";
+                        try{
+                            if(sheet.getRow(i).getCell(BNS_PRICE_PHONE_CELL).getCellType() != CellType.BLANK
+                                    && !sheet.getRow(i).getCell(BNS_PRICE_PHONE_CELL).toString().trim().equals("")){
+                                Double.valueOf(sheet.getRow(i).getCell(BNS_PRICE_PHONE_CELL).toString());
+                                bnsPhonePrice = sheet.getRow(i).getCell(BNS_PRICE_PHONE_CELL).toString() + "\r\n";
+
+                            }else{
+                                //100000
+                                bnsPhonePrice = "100000" + "\r\n";
+                            }
+                        }catch (Exception e){}
+
 
                         cascadeUploadFile.write(content);
-                        mappingFile.write(mappingFileContent);
+                        mappingFile.write(mappingFileContent + bnsPhonePrice);
 
                     }catch (Exception e){
                         System.out.println("value of i ="+i );
@@ -219,6 +257,8 @@ public class CascadeServiceFromOrderList {
                 orderListSnoMapping.add(Integer.valueOf(v.split(",")[0]));
                 orderListDescMapping.add(v.split(",")[1]);
                 orderListPipCodesMapping.add(v.split(",")[2]);
+                bnsPipOrderListMapping.add(v.split(",")[4]);
+                bnsPhonePriceOrderListMapping.add(StringUtils.isEmpty(v.split(",")[5])? Double.valueOf("100000"):Double.valueOf(v.split(",")[5]));
             });
         }
 
@@ -360,12 +400,16 @@ public class CascadeServiceFromOrderList {
             Integer rowNumberOrderList = orderListSnoMapping.get(mappingSheetRownumber);
             String descOrderList = orderListDescMapping.get(mappingSheetRownumber);
             String pipCodeOrderList = orderListPipCodesMapping.get(mappingSheetRownumber);
+            String bnsPipCode = bnsPipOrderListMapping.get(mappingSheetRownumber);
+            Double bnsPhonePrice = bnsPhonePriceOrderListMapping.get(mappingSheetRownumber);
             mappingSheetRownumber++;
 
             String description = entry.getKey();
             System.out.println("OrderList row number: "+rowNumberOrderList +"; Description from cascade: "+description);
             orderListDataPrepared.put(OrderListKey.builder()
                             .sno(rowNumberOrderList).orderListDesc(descOrderList).orderListPipCode(pipCodeOrderList)
+                            .bnsPipCode(bnsPipCode)
+                            .bnsPhonePrice(bnsPhonePrice)
                     .build(), entry.getValue());
         }
 

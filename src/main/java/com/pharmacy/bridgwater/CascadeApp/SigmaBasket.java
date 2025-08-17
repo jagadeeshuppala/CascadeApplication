@@ -17,17 +17,19 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.io.*;
 import java.util.*;
 
-import static com.pharmacy.bridgwater.CascadeApp.Server.*;
-import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.SIGMA_PIP_CELL;
+//import static com.pharmacy.bridgwater.CascadeApp.Server.*;
+import static com.pharmacy.bridgwater.CascadeApp.Desktop.WORK_TO_BE_DONE_FILE_NAME;
+
+import static com.pharmacy.bridgwater.CascadeApp.constants.Constants.*;
 import static com.pharmacy.bridgwater.CascadeApp.service.SigmaProcessService.stockAvailability;
 
-public class OrderSigma {
+public class SigmaBasket {
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        OrderSigma orderSigma = new OrderSigma();
+        SigmaBasket sigmaBasket = new SigmaBasket();
         //orderSigma.placeOrder(Arrays.asList(SigmaOrderData.builder().pip("1105865").quantity(5).build(), SigmaOrderData.builder().pip("5012448").quantity(2).build(), SigmaOrderData.builder().pip("1087105").quantity(2).build()));
-        List<SigmaOrderData> sigmaOrderDataList = orderSigma.getOrderListBasket();
-        orderSigma.placeOrder(sigmaOrderDataList);
+        List<SigmaOrderData> sigmaOrderDataList = sigmaBasket.getOrderListBasket();
+        sigmaBasket.placeOrder(sigmaOrderDataList);
         //System.out.println(sigmaOrderDataList);
 
     }
@@ -44,20 +46,11 @@ public class OrderSigma {
             System.out.println("lastRowNumber::" + sheet.getLastRowNum());
 
             for (int i = 1; i <= sheet.getLastRowNum() && sheet.getRow(i) != null; i++) {
-                if (sheet.getRow(i).getCell(ORDER_LIST_DESC) != null
-                        && sheet.getRow(i).getCell(ORDER_LIST_PIP) != null
-                        && sheet.getRow(i).getCell(ORDER_LIST_QTY) != null
-                        && sheet.getRow(i).getCell(ORDER_LIST_FROM) != null
+                if (
+                         sheet.getRow(i).getCell(ORDER_LIST_FROM) != null
                         && sheet.getRow(i).getCell(SIGMA_PIP_CELL) != null
-
-                        && sheet.getRow(i).getCell(ORDER_LIST_DESC).getCellType() != CellType.BLANK
-                        && !sheet.getRow(i).getCell(ORDER_LIST_DESC).toString().trim().equals("")
-                        && sheet.getRow(i).getCell(ORDER_LIST_PIP).getCellType() != CellType.BLANK
-                        && !sheet.getRow(i).getCell(ORDER_LIST_PIP).toString().trim().equals("")
-                        && sheet.getRow(i).getCell(ORDER_LIST_QTY).getCellType() != CellType.BLANK
-                        && !sheet.getRow(i).getCell(ORDER_LIST_QTY).toString().trim().equals("")
                         && sheet.getRow(i).getCell(ORDER_LIST_FROM).getCellType() != CellType.BLANK
-                        && sheet.getRow(i).getCell(ORDER_LIST_FROM).toString().trim().equalsIgnoreCase(SIGMA_ORDERING_TEXT_IN_NOTES)
+                        &&sheet.getRow(i).getCell(ORDER_LIST_FROM).toString().trim().equalsIgnoreCase("SS")
                         && sheet.getRow(i).getCell(SIGMA_PIP_CELL).getCellType() != CellType.BLANK
                         && !sheet.getRow(i).getCell(SIGMA_PIP_CELL).toString().trim().equals("")
                 ) {

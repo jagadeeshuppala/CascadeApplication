@@ -8,6 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,10 +48,7 @@ public class Desktop {
         public static final String CASCADE_UPLOAD_FILE_NAME_WITH_ORDER_LIST_SNO = "mapping.txt";
 
 
-        public static final int ORDER_LIST_DESC = 0;
-        public static final int ORDER_LIST_PIP = 1;
-        public static final int ORDER_LIST_QTY = 3;
-        public static final int ORDER_LIST_FROM = 4;
+
 
         public static final String SIGMA_ORDERING_TEXT_IN_NOTES = "s";
 
@@ -69,6 +70,10 @@ public class Desktop {
                 FileInputStream file = new FileInputStream(WORK_TO_BE_DONE_FILE_NAME);
                 Workbook workbook = new XSSFWorkbook(file);
                 Sheet sheet0 = workbook.getSheetAt(0);
+
+                FileInputStream copiedFile = new FileInputStream(COPIED_FILE_NAME);
+                Workbook bakupFileWorkbook = new XSSFWorkbook(copiedFile);
+                Sheet copiedSheet = bakupFileWorkbook.getSheetAt(0);
 
 
 
@@ -135,7 +140,9 @@ public class Desktop {
 
 
 
-                ExecutorService executor = Executors.newFixedThreadPool(4);
+
+
+            ExecutorService executor = Executors.newFixedThreadPool(5);
 
 
                 //Filter aahResults and pass it to Aah service to fetch the aah results
@@ -182,6 +189,8 @@ public class Desktop {
                 Callable<Map<OrderListKey, Set<ActualSupplierData>>> sigmaWorker = new SigmaProcessService(sigmaPipCodes);
                 Future<Map<OrderListKey, Set<ActualSupplierData>>>  sigmaFuture = executor.submit(sigmaWorker);
 
+                Callable<Map<OrderListKey, Set<ActualSupplierData>>> bnsWorker = new BNSProcessService(cascadeResults.keySet());
+                Future<Map<OrderListKey, Set<ActualSupplierData>>>  bnsFuture = executor.submit(bnsWorker);
 
                 executor.shutdown();
 
@@ -189,6 +198,7 @@ public class Desktop {
                 Map<OrderListKey, Set<ActualSupplierData>> tridentProcessedResults = tridentFuture.get();
                 Map<OrderListKey, Set<ActualSupplierData>> bestwayProcessedResults = bestwayFuture.get();
                 Map<OrderListKey, Set<ActualSupplierData>> sigmaProcessedResults = sigmaFuture.get();
+                Map<OrderListKey, Set<ActualSupplierData>> bnsProcessedResults = bnsFuture.get();
 
 
 
@@ -202,40 +212,19 @@ public class Desktop {
 
                         // add sigma processed results
                         entry.getValue().addAll(sigmaProcessedResults.get(key));
+
+                        //add Bns Processed results
+                        Set<ActualSupplierData> actualSupplierData = bnsProcessedResults.get(key);
+                        if(actualSupplierData!=null){
+                            entry.getValue().addAll(bnsProcessedResults.get(key));
+                        }
+
                 }
 
                 System.out.println(cascadeResults);
 
 
 
-
-                /*Row row0 = my_sheet.createRow(0);
-                Cell cell0_1 = row0.createCell(ORDER_LIST_DESC_CELL); cell0_1.setCellValue("OrderList Desc"); cell0_1.setCellStyle(normalFontStyle);
-                Cell cell0_2 = row0.createCell(CASCADE_DESC_CELL); cell0_2.setCellValue("cascade Desc"); cell0_2.setCellStyle(normalFontStyle);
-                Cell cell0_3 = row0.createCell(QUANTITY_CELL); cell0_3.setCellValue("Quantity"); cell0_3.setCellStyle(normalFontStyle);
-                Cell cell0_4 = row0.createCell(FROM_CELL); cell0_4.setCellValue("From"); cell0_4.setCellStyle(normalFontStyle);
-                Cell cell0_5 = row0.createCell(NOTES_CELL); cell0_5.setCellValue("Notes"); cell0_5.setCellStyle(normalFontStyle);
-                Cell cell0_6 = row0.createCell(TARRIF_CELL); cell0_6.setCellValue("Tariff"); cell0_6.setCellStyle(normalFontStyle);
-                Cell cell0_7 = row0.createCell(TARIFF_AFTER_DEDUCTION_CELL); cell0_7.setCellValue("DTnet"); cell0_6.setCellStyle(normalFontStyle);
-                Cell cell0_8 = row0.createCell(CONCESSION_CELL); cell0_8.setCellValue("Concession"); cell0_8.setCellStyle(normalFontStyle);
-                Cell cell0_9 = row0.createCell(ORDER_LIST_PIP_CODE_CELL); cell0_9.setCellValue("Order list pip"); cell0_9.setCellStyle(normalFontStyle);
-                Cell cell0_10 = row0.createCell(AAH_PRICE_CELL); cell0_10.setCellValue("AAH "); cell0_10.setCellStyle(normalFontStyle);
-                Cell cell0_11 = row0.createCell(AAH_PIP_CELL); cell0_11.setCellValue("AAH Pip"); cell0_11.setCellStyle(normalFontStyle);
-                Cell cell0_12 = row0.createCell(BESTWAY_PRICE_CELL); cell0_12.setCellValue("Bestway"); cell0_12.setCellStyle(normalFontStyle);
-                Cell cell0_13 = row0.createCell(BESTWAY_PIP_CELL); cell0_13.setCellValue("Bestway pip"); cell0_13.setCellStyle(normalFontStyle);
-                Cell cell0_14 = row0.createCell(BNS_PRICE_CELL); cell0_14.setCellValue("BNS"); cell0_14.setCellStyle(normalFontStyle);
-                Cell cell0_15 = row0.createCell(BNS_PIP_CELL); cell0_15.setCellValue("BNS Pip"); cell0_15.setCellStyle(normalFontStyle);
-                Cell cell0_16 = row0.createCell(LEXON_PRICE_CELL); cell0_16.setCellValue("Lexon"); cell0_16.setCellStyle(normalFontStyle);
-                Cell cell0_17 = row0.createCell(LEXON_PIP_CELL); cell0_17.setCellValue("Lexon Pip"); cell0_17.setCellStyle(normalFontStyle);
-                Cell cell0_18 = row0.createCell(OTC_PRICE_CELL); cell0_18.setCellValue("OTC"); cell0_18.setCellStyle(normalFontStyle);
-                Cell cell0_19 = row0.createCell(OTC_PIP_CELL); cell0_19.setCellValue("OTC Pip"); cell0_19.setCellStyle(normalFontStyle);
-                Cell cell0_20 = row0.createCell(SIGMA_PRICE_CELL); cell0_20.setCellValue("Sigma"); cell0_20.setCellStyle(normalFontStyle);
-                Cell cell0_21 = row0.createCell(SIGMA_PIP_CELL); cell0_21.setCellValue("Sigma Pip"); cell0_21.setCellStyle(normalFontStyle);
-                Cell cell0_22 = row0.createCell(TRIDENT_PRICE_CELL); cell0_22.setCellValue("Trident Pip"); cell0_22.setCellStyle(normalFontStyle);
-                Cell cell0_23 = row0.createCell(TRIDENT_PIP_CELL); cell0_23.setCellValue("Trident Pip"); cell0_23.setCellStyle(normalFontStyle);
-                Cell cell0_24 = row0.createCell(ALLIANCE_PRICE_CELL); cell0_24.setCellValue("Alliance Price"); cell0_24.setCellStyle(normalFontStyle);
-                Cell cell0_25 = row0.createCell(ALLIANCE_PIP_CELL); cell0_25.setCellValue("Alliance Pip"); cell0_25.setCellStyle(normalFontStyle);
-                Cell cell0_26 = row0.createCell(LOOKED_UP_AT); cell0_26.setCellValue("Lookedup At"); cell0_26.setCellStyle(normalFontStyle);*/
 
 
                 // iterate through the map to find out which one is least and add to the excel
@@ -326,6 +315,7 @@ public class Desktop {
 
 
                         Row sheet0Row = sheet0.getRow(key.getSno());
+                        Row copiedFileRow = copiedSheet.getRow(key.getSno());
 
 
                         //Order list desc
@@ -418,6 +408,7 @@ public class Desktop {
                                 }
                         }else{
                                 //cell9.setCellValue("NS");
+                            cell9.setCellValue(copiedFileRow.getCell(AAH_PRICE_CELL).getNumericCellValue());
                         }
 
                         //AAH pip
@@ -454,6 +445,7 @@ public class Desktop {
                                 }
                         }else{
                                 //cell11.setCellValue("NS");
+                            cell11.setCellValue(copiedFileRow.getCell(BESTWAY_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Bestway pip
@@ -472,12 +464,20 @@ public class Desktop {
                         if(null != cheaperBnsData && null != cheaperPrice ){
                                 //if cheaper is bns, and available then yellow back with green -- greenBoldFontStyle
                                 //if bns stock available then green, if stock not available then red
-                                if(null != cheaperBnsData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBnsData.getStatus())
+                            if(null != cheaperBnsData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBnsData.getStatus())
                                         && null != cheaperBnsData.getPrice()
                                         && null != cheaperPrice.getPrice()
                                         && cheaperPrice.getPrice().compareTo(cheaperBnsData.getPrice()) == 0){
+
+                                    if(key.getBnsPhonePrice().compareTo(cheaperBnsData.getPrice()) >0){
                                         cell13.setCellValue(cheaperBnsData.getPrice());
                                         cell13.setCellStyle(greenBoldFontStyle);
+                                    }else{
+                                        cell13.setCellValue(key.getBnsPhonePrice());
+                                        //cell13.setCellStyle(greenBoldFontStyle);
+                                    }
+
+
                                 }else{
                                         if(null != cheaperBnsData.getStatus() && SUPPLIER_STATUS_AVAILABLE.equalsIgnoreCase(cheaperBnsData.getStatus())){
                                                 cell13.setCellValue(cheaperBnsData.getPrice());
@@ -490,6 +490,7 @@ public class Desktop {
                                 }
                         }else{
                                 //cell13.setCellValue("NS");
+                            cell13.setCellValue(copiedFileRow.getCell(BNS_PRICE_CELL).getNumericCellValue());
                         }
 
                         //BNS pip
@@ -526,6 +527,7 @@ public class Desktop {
                                 }
                         }else{
                                 //cell15.setCellValue("NS");
+                            cell15.setCellValue(copiedFileRow.getCell(LEXON_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Lexon pip
@@ -572,6 +574,7 @@ public class Desktop {
                                 }
                         }else{
                                 //cell19.setCellValue("NS");
+                            cell19.setCellValue(copiedFileRow.getCell(SIGMA_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Sigma pip
@@ -608,6 +611,7 @@ public class Desktop {
                                 }
                         }else{
                                 //cell21.setCellValue("NS");
+                            cell21.setCellValue(copiedFileRow.getCell(TRIDENT_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Trident pip
@@ -644,6 +648,7 @@ public class Desktop {
                                 }
                         }else{
                                 //cell23.setCellValue("NS");
+                            cell23.setCellValue(copiedFileRow.getCell(ALLIANCE_PRICE_CELL).getNumericCellValue());
                         }
 
                         //Alliance pip
@@ -746,6 +751,11 @@ public class Desktop {
 
                 }
 
+            makeSound();
+            Scanner input = new Scanner(System.in);
+            System.out.print("Can you please check if the order list file is open on any other clients, if yes can you please save and close that file and press enter to continue");
+            String nextLine = input.nextLine();
+
                 /* Write changes to the workbook */
                 FileOutputStream out = new FileOutputStream(WORK_TO_BE_DONE_FILE_NAME);
                 workbook.write(out);
@@ -755,4 +765,28 @@ public class Desktop {
                 System.out.println("Total time taken ======>"+ (endTime-startTime)/1000 +" Seconds");
 
         }
+
+
+
+    public static void makeSound() throws LineUnavailableException {
+        System.out.println("Make sound");
+        byte[] buf = new byte[2];
+        int frequency = 44100; //44100 sample points per 1 second
+        AudioFormat af = new AudioFormat((float) frequency, 16, 1, true, false);
+        SourceDataLine sdl = AudioSystem.getSourceDataLine(af);
+        sdl.open();
+        sdl.start();
+        int durationMs = 5000;
+        int numberOfTimesFullSinFuncPerSec = 441; //number of times in 1sec sin function repeats
+        for (int i = 0; i < durationMs * (float) 44100 / 1000; i++) { //1000 ms in 1 second
+            float numberOfSamplesToRepresentFullSin= (float) frequency / numberOfTimesFullSinFuncPerSec;
+            double angle = i / (numberOfSamplesToRepresentFullSin/ 2.0) * Math.PI;  // /divide with 2 since sin goes 0PI to 2PI
+            short a = (short) (Math.sin(angle) * 32767);  //32767 - max value for sample to take (-32767 to 32767)
+            buf[0] = (byte) (a & 0xFF); //write 8bits ________WWWWWWWW out of 16
+            buf[1] = (byte) (a >> 8); //write 8bits WWWWWWWW________ out of 16
+            sdl.write(buf, 0, 2);
+        }
+        sdl.drain();
+        sdl.stop();
+    }
 }
