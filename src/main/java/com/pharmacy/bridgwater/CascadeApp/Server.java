@@ -404,7 +404,12 @@ public class Server {
                                 }
                         }else{
                                 //cell9.setCellValue("NS");
-                            cell9.setCellValue(copiedFileRow.getCell(AAH_PRICE_CELL).getNumericCellValue());
+                            try{
+                                cell9.setCellValue(copiedFileRow.getCell(AAH_PRICE_CELL).getNumericCellValue());
+                            }catch (Exception e){
+                                System.out.println("AAH_PRICE_CELL price cell problem at "+copiedFileRow);
+                            }
+
                         }
 
                         //AAH pip
@@ -441,7 +446,12 @@ public class Server {
                                 }
                         }else{
                                 //cell11.setCellValue("NS");
-                            cell11.setCellValue(copiedFileRow.getCell(BESTWAY_PRICE_CELL).getNumericCellValue());
+                            try{
+                                cell11.setCellValue(copiedFileRow.getCell(BESTWAY_PRICE_CELL).getNumericCellValue());
+                            }catch (Exception e){
+                                System.out.println("Bestway price cell problem at "+copiedFileRow);
+                            }
+
                         }
 
                         //Bestway pip
@@ -486,7 +496,12 @@ public class Server {
                                 }
                         }else{
                                 //cell13.setCellValue("NS");
-                            cell13.setCellValue(copiedFileRow.getCell(BNS_PRICE_CELL).getNumericCellValue());
+                            try{
+                                cell13.setCellValue(copiedFileRow.getCell(BNS_PRICE_CELL).getNumericCellValue());
+                            }catch (Exception e){
+                                System.out.println("BNS_PRICE_CELL price cell problem at "+copiedFileRow);
+                            }
+
                         }
 
                         //BNS pip
@@ -523,7 +538,12 @@ public class Server {
                                 }
                         }else{
                                 //cell15.setCellValue("NS");
-                            cell15.setCellValue(copiedFileRow.getCell(LEXON_PRICE_CELL).getNumericCellValue());
+
+                            try{
+                                cell15.setCellValue(copiedFileRow.getCell(LEXON_PRICE_CELL).getNumericCellValue());
+                            }catch (Exception e){
+                                System.out.println("LEXON_PRICE_CELL price cell problem at "+copiedFileRow);
+                            }
                         }
 
                         //Lexon pip
@@ -570,7 +590,12 @@ public class Server {
                                 }
                         }else{
                                 //cell19.setCellValue("NS");
-                            cell19.setCellValue(copiedFileRow.getCell(SIGMA_PRICE_CELL).getNumericCellValue());
+
+                            try{
+                                cell19.setCellValue(copiedFileRow.getCell(SIGMA_PRICE_CELL).getNumericCellValue());
+                            }catch (Exception e){
+                                System.out.println("SIGMA_PRICE_CELL price cell problem at "+copiedFileRow);
+                            }
                         }
 
                         //Sigma pip
@@ -607,7 +632,12 @@ public class Server {
                                 }
                         }else{
                                 //cell21.setCellValue("NS");
-                            cell21.setCellValue(copiedFileRow.getCell(TRIDENT_PRICE_CELL).getNumericCellValue());
+
+                            try{
+                                cell21.setCellValue(copiedFileRow.getCell(TRIDENT_PRICE_CELL).getNumericCellValue());
+                            }catch (Exception e){
+                                System.out.println("TRIDENT_PRICE_CELL price cell problem at "+copiedFileRow);
+                            }
                         }
 
                         //Trident pip
@@ -644,7 +674,12 @@ public class Server {
                                 }
                         }else{
                                 //cell23.setCellValue("NS");
-                            cell23.setCellValue(copiedFileRow.getCell(ALLIANCE_PRICE_CELL).getNumericCellValue());
+
+                            try{
+                                cell23.setCellValue(copiedFileRow.getCell(ALLIANCE_PRICE_CELL).getNumericCellValue());
+                            }catch (Exception e){
+                                System.out.println("ALLIANCE_PRICE_CELL price cell problem at "+copiedFileRow);
+                            }
                         }
 
                         //Alliance pip
