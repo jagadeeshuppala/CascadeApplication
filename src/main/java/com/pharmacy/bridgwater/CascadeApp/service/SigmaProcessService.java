@@ -71,7 +71,7 @@ public class SigmaProcessService implements Callable<Map<OrderListKey, Set<Actua
         driver.findElement(By.id("login_btn"))
                 .sendKeys(Keys.RETURN);
 
-        Thread.sleep(1000);
+        Thread.sleep(15000);
 
         int totalNoOfRecords = cascadeDataForSigma.size();
 
