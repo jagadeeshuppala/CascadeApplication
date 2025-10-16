@@ -13,6 +13,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.*;
 import java.util.*;
@@ -85,7 +86,16 @@ public class ToSigma {
         if(!sigmaOrderPipCodes.isEmpty()){
             Map<OrderListKey, Set<ActualSupplierData>> sigmaOnlyProcessedData = new LinkedHashMap<>();
             WebDriverManager.chromedriver().setup();;
-            WebDriver driver = new ChromeDriver();
+            //setup chromeoptions
+            ChromeOptions options = new ChromeOptions();
+
+            options.addArguments("window-size=1920,1080");
+
+            options.addArguments("disable-blink-features=AutomationControlled") ;
+            options.setExperimentalOption("excludeSwitches", Arrays.asList("enable-automation"));
+            options.setExperimentalOption("useAutomationExtension", false);
+
+            WebDriver driver = new ChromeDriver(options);
             driver.get("https://www.sigconnect.co.uk/login");
 
             driver.findElement(By.id("loginform-username")).sendKeys("bridgwater.pharmacy@nhs.net");
@@ -93,7 +103,7 @@ public class ToSigma {
             driver.findElement(By.id("login_btn"))
                     .sendKeys(Keys.RETURN);
 
-            Thread.sleep(1000);
+            Thread.sleep(5000);
 
             for(SigmaOrderData sigmaOrderData : sigmaOrderPipCodes){
                 Thread.sleep(1000);
@@ -104,7 +114,7 @@ public class ToSigma {
                     pipTextBox.clear();
                     pipTextBox.sendKeys(sigmaOrderData.getPip());
                     pipTextBox.sendKeys("\n\n");
-                    Thread.sleep(5000);
+                    Thread.sleep(10000);
 
                     String stockClass = driver.findElement(By.xpath("/html/body/article/div/div[3]/div/dl/div/dt")).getAttribute("class");
                     if(!stockClass.equalsIgnoreCase("ng-binding special")){

@@ -8,6 +8,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -50,8 +51,19 @@ public class SigmaProcessService implements Callable<Map<OrderListKey, Set<Actua
     public Map<OrderListKey,Set<ActualSupplierData>> call() throws InterruptedException {
 
         Map<OrderListKey,Set<ActualSupplierData>> sigmaOnlyProcessedData = new LinkedHashMap<>();
+
         WebDriverManager.chromedriver().setup();;
-        WebDriver driver = new ChromeDriver();
+        //setup chromeoptions
+        ChromeOptions options = new ChromeOptions();
+
+        options.addArguments("window-size=1920,1080");
+
+        options.addArguments("disable-blink-features=AutomationControlled") ;
+        options.setExperimentalOption("excludeSwitches", Arrays.asList("enable-automation"));
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        WebDriver driver = new ChromeDriver(options);
+
         driver.get("https://www.sigconnect.co.uk/login");
 
         driver.findElement(By.id("loginform-username")).sendKeys("bridgwater.pharmacy@nhs.net");
