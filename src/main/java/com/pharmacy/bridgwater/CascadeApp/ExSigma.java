@@ -724,6 +724,9 @@ public class ExSigma {
                                 cell29.setCellValue(cheaperBestwayData.getCascadePrice());
                         }
 
+
+
+
                         //Bestway Cascade status
                         Cell cell30 = sheet0Row.createCell(BESTWAY_CASCADE_STATUS_CELL);
                         if(null !=cheaperBestwayData && null != cheaperBestwayData.getCascadeStatus()){
