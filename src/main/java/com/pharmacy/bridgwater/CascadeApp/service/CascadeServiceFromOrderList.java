@@ -65,7 +65,7 @@ public class CascadeServiceFromOrderList {
             System.out.println("lastRowNumber::"+sheet.getLastRowNum());
 
             DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("dd/MM HH:mm")
-                    .parseDefaulting(ChronoField.YEAR, LocalDate.now().getYear())
+                    .parseDefaulting(ChronoField.YEAR, LocalDate.now().getYear() -1 )
                     .toFormatter();
 
 
