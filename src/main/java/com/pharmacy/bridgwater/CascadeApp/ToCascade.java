@@ -134,7 +134,7 @@ public class ToCascade {
             driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[10]/div[2]/div[1]/div[1]/div[1]/div[1]/table[1]/thead[1]/tr[1]/th[1]/input[1]")).click();
             Thread.sleep(1000);
             //select the delete button
-            driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[1]/div[2]/div[2]/div[1]/div[1]/button[1]")).click();
+            driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[1]/div[2]/div[2]/div[2]/div[1]/button[1]")).click();
             Thread.sleep(1000);
             driver.findElement(By.xpath("/html/body/div[4]/div/div/div[3]/div/div/button[2]")).click();
 
@@ -145,7 +145,7 @@ public class ToCascade {
         Thread.sleep(5000);
 
         //click on upload button
-        driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[1]/div[2]/div[2]/div[1]/div[1]/button[4]")).click();
+        driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[1]/div[2]/div[2]/div[2]/div[1]/button[4]")).click();
         Thread.sleep(1000);
 
         //click on choose button
@@ -183,8 +183,9 @@ public class ToCascade {
 
             FileUtils.writeLines(overridenMappingFile, lines, false);
 
+            driver.findElement(By.xpath("/html/body/div[1]/div[2]/form/div[9]/div/div/div[2]/div[2]/button")).click();
+            //driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[6]/div[1]/div[1]/div[1]/button[1]")).click();
 
-            driver.findElement(By.xpath("/html[1]/body[1]/div[1]/div[2]/form[1]/div[6]/div[1]/div[1]/div[1]/button[1]")).click();
 
 
 

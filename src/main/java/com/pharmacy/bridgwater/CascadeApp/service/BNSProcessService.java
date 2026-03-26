@@ -67,9 +67,10 @@ public class BNSProcessService implements Callable<Map<OrderListKey, Set<ActualS
                 Thread.sleep(1000);
 
                 // search box
-                driver.findElement(By.xpath("//html[1]/body[1]/strong[1]/strong[1]/div[2]/div[2]/div[1]/div[1]/input[1]")).clear();
-                driver.findElement(By.xpath("//html[1]/body[1]/strong[1]/strong[1]/div[2]/div[2]/div[1]/div[1]/input[1]")).sendKeys(bnsPip);
-                driver.findElement(By.xpath("/html[1]/body[1]/strong[1]/strong[1]/div[2]/div[2]/div[1]/div[1]/input[1]")).sendKeys(Keys.RETURN);
+
+                driver.findElement(By.xpath("/html[1]/body[1]/strong[1]/strong[1]/div[3]/div[2]/div[1]/div[1]/input[1]")).clear();
+                driver.findElement(By.xpath("/html[1]/body[1]/strong[1]/strong[1]/div[3]/div[2]/div[1]/div[1]/input[1]")).sendKeys(bnsPip);
+                driver.findElement(By.xpath("/html[1]/body[1]/strong[1]/strong[1]/div[3]/div[2]/div[1]/div[1]/input[1]")).sendKeys(Keys.RETURN);
                 Thread.sleep(2000);
                 // retrieved product list click
                 try{
