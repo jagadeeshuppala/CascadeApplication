@@ -128,7 +128,14 @@ public class Server {
 
 
                 CascadeServiceFromOrderList cascade = new CascadeServiceFromOrderList();
-                Map<OrderListKey, Set<ActualSupplierData>> cascadeResults =  cascade.getCascadeResult(WORK_TO_BE_DONE_FILE_NAME);
+                Map<OrderListKey, Set<ActualSupplierData>> cascadeResults =  new HashMap<>();
+                try{
+                    cascadeResults = cascade.getCascadeResult(WORK_TO_BE_DONE_FILE_NAME);
+                }catch (Exception e){
+                    System.out.println("Exception in getting cascade restults "+ e.getMessage());
+                }
+
+
                 Map<OrderListKey, Set<String>> sigmaPipCodes =  new LinkedHashMap<>();
                 for (Map.Entry<OrderListKey, Set<ActualSupplierData>> entry : cascadeResults.entrySet()) {
                         sigmaPipCodes.put(entry.getKey(), entry.getValue().stream().filter(v -> !StringUtils.isEmpty(v.getCode())).map(ActualSupplierData::getCode).collect(Collectors.toSet()));
@@ -190,11 +197,39 @@ public class Server {
 
                 executor.shutdown();
 
-                Map<OrderListKey, Set<ActualSupplierData>> aahProcessedResults = aahFuture.get();
-                Map<OrderListKey, Set<ActualSupplierData>> tridentProcessedResults = tridentFuture.get();
-                Map<OrderListKey, Set<ActualSupplierData>> bestwayProcessedResults = bestwayFuture.get();
-                Map<OrderListKey, Set<ActualSupplierData>> sigmaProcessedResults = sigmaFuture.get();
-                Map<OrderListKey, Set<ActualSupplierData>> bnsProcessedResults = bnsFuture.get();
+                Map<OrderListKey, Set<ActualSupplierData>> aahProcessedResults = new HashMap<>();
+                Map<OrderListKey, Set<ActualSupplierData>> tridentProcessedResults = new HashMap<>();
+                Map<OrderListKey, Set<ActualSupplierData>> bestwayProcessedResults = new HashMap<>();
+                Map<OrderListKey, Set<ActualSupplierData>> sigmaProcessedResults = new HashMap<>();
+                Map<OrderListKey, Set<ActualSupplierData>> bnsProcessedResults = new HashMap<>();
+
+                try{
+                    aahProcessedResults = aahFuture.get();
+                }catch (Exception e){
+                    System.out.println("Failed in aah "+ e.getMessage());
+                }
+                try{
+                    tridentProcessedResults = tridentFuture.get();
+                }catch (Exception e){
+                    System.out.println("Failed in Trident "+ e.getMessage());
+                }
+                try{
+                    bestwayProcessedResults = bestwayFuture.get();
+                }catch (Exception e){
+                    System.out.println("Failed in Bestway "+ e.getMessage());
+                }
+                try{
+                    sigmaProcessedResults = sigmaFuture.get();
+                }catch (Exception e){
+                    System.out.println("Failed in sigma "+ e.getMessage());
+                }
+                try{
+                    bnsProcessedResults = bnsFuture.get();
+                }catch (Exception e){
+                    System.out.println("Failed in BNS "+ e.getMessage());
+                }
+
+
 
 
 

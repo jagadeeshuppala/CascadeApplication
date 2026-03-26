@@ -145,9 +145,6 @@ public class CascadeServiceFromOrderList {
 
 
 
-        System.out.println();
-
-
 
         WebDriverManager.chromedriver().setup();
         WebDriver driver = new ChromeDriver();
