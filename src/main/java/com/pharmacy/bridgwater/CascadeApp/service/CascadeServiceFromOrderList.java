@@ -258,6 +258,8 @@ public class CascadeServiceFromOrderList {
                 bnsPipOrderListMapping.add(v.split(",")[4]);
                 bnsPhonePriceOrderListMapping.add(StringUtils.isEmpty(v.split(",")[5])? Double.valueOf("100000"):Double.valueOf(v.split(",")[5]));
             });
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
 

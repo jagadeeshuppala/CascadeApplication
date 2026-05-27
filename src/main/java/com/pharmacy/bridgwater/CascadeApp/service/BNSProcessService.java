@@ -49,7 +49,8 @@ public class BNSProcessService implements Callable<Map<OrderListKey, Set<ActualS
 
         driver.findElement(By.id("userName")).sendKeys("bridgwater.pharmacy@nhs.net");
         driver.findElement(By.id("pass")).sendKeys("Brid@8486");
-        driver.findElement(By.xpath("/html[1]/body[1]/main[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/div[4]/button[1]"))
+        //driver.findElement(By.xpath("/html[1]/body[1]/main[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/div[4]/button[1]"))
+        driver.findElement(By.xpath("/html[1]/body[1]/app-root[1]/app-main-layout[1]/main[1]/app-login[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/div[5]/button[1]"))
                 .sendKeys(Keys.RETURN);
 
         Thread.sleep(1000);
